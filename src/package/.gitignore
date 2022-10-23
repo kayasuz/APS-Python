@@ -1,0 +1,6 @@
+# ignore as pastas __pycache__
+**/__pycache__/
+# ignore os arquivos com a extensão *.pyc, mas não ignore arquivos com o nome .pyc
+**/*.pyc
+!**/.pyc
+

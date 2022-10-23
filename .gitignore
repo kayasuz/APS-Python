@@ -1,0 +1,3 @@
+# ignore pastas temporárias usadas na compilação
+/build/
+/*.egg-info/
