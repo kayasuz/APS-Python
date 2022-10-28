@@ -1,7 +1,13 @@
+
+# bibliotecas de terceiros
 import cv2
 import mediapipe as mp
+# biblioteca padrão
+import os
 import math
-video = cv2.VideoCapture('push-ups.mp4')
+# biblioteca do programa
+from package.video import abrir_video, extrair_frames
+
 # variável que traz os modelos do corpo humano
 pose = mp.solutions.pose
 # variável responsável pela detecção
@@ -12,41 +18,42 @@ draw = mp.solutions.drawing_utils
 contador = 0
 # variável para controlar a contagem de flexões
 check = True
-while True:
-    sucess, img = video.read()
-    # analisa o corpo da pessoa
-    results = Pose.process(img)
-    # pontos do corpo humano
-    points = results.pose_landmarks
-    # linhas no corpo
-    draw.draw_landmarks(img,points,pose.POSE_CONNECTIONS)
-    # variáveis da altura,largura e numero de canais da imagem
-    h, w, _ = img.shape
 
-    # variáveis para os pontos, com os pontos ajustados ao tamanho da tela
-    if points:
-        ombroDx = int(points.landmark[pose.PoseLandmark.RIGHT_SHOULDER].x * w)
-        ombroDy = int(points.landmark[pose.PoseLandmark.RIGHT_SHOULDER].y * h)
-        pulsoDx = int(points.landmark[pose.PoseLandmark.RIGHT_WRIST].x * w)
-        pulsoDy = int(points.landmark[pose.PoseLandmark.RIGHT_WRIST].y * h)
+arquivo = os.path.join('videos', 'push-ups.mp4')
+with abrir_vide(arquivo) as captura:
+    for img in extrair_frames(captura):
+        results = Pose.process(img)
+        # pontos do corpo humano
+        points = results.pose_landmarks
+        # linhas no corpo
+        draw.draw_landmarks(img,points,pose.POSE_CONNECTIONS)
+        # variáveis da altura,largura e numero de canais da imagem
+        h, w, _ = img.shape
 
-        # distancia entre mão e o ombro
-        distMaoxombro = math.hypot(ombroDx - pulsoDx, ombroDy - pulsoDy)
+        # variáveis para os pontos, com os pontos ajustados ao tamanho da tela
+        if points:
+            ombroDx = int(points.landmark[pose.PoseLandmark.RIGHT_SHOULDER].x * w)
+            ombroDy = int(points.landmark[pose.PoseLandmark.RIGHT_SHOULDER].y * h)
+            pulsoDx = int(points.landmark[pose.PoseLandmark.RIGHT_WRIST].x * w)
+            pulsoDy = int(points.landmark[pose.PoseLandmark.RIGHT_WRIST].y * h)
 
-        # contagem da flexão
-        if check == True and distMaoxombro <= 70:
-            contador +=1
-            check = False
+            # distancia entre mão e o ombro
+            distMaoxombro = math.hypot(ombroDx - pulsoDx, ombroDy - pulsoDy)
 
-        if distMaoxombro >=100 :
-            check = True
+            # contagem da flexão
+            if check == True and distMaoxombro <= 70:
+                contador +=1
+                check = False
 
-        # texto na tela
-        texto = f'Contagem = {contador}'
-        cv2.putText(img,texto,(40,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,200,255),3)
+            if distMaoxombro >=100 :
+                check = True
 
-    cv2.imshow('Resutado',img)
-    # tecla para encerrar o loop e fechar o programa
-    if cv2.waitKey(40) & 0xFF == ord('q'):
-        break
+            # texto na tela
+            texto = f'Contagem = {contador}'
+            cv2.putText(img,texto,(40,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,200,255),3)
+
+        cv2.imshow('Resutado',img)
+        # tecla para encerrar o loop e fechar o programa
+        if cv2.waitKey(40) & 0xFF == ord('q'):
+            break
 
