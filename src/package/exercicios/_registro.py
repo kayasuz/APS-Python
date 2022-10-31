@@ -51,7 +51,7 @@ def contar_exercicios(exercicio, video):
                         f"recebido um valor do tipo {type(exercicio).__qualname__}")
 
     # checagem de valor
-    if video < 0:
+    if isinstance(video, int) and video < 0:
         raise ValueError(f"o parâmetro 'video' não pode ser um número negativo")
 
     # contador do exercício
