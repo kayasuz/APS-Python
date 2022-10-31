@@ -41,7 +41,7 @@ def listar_exercicios():
     return list(__exercicios.keys())
 
 @exportar
-def contar_exercio(exercicio, video):
+def contar_exercicios(exercicio, video):
     # checagem de tipos
     if not isinstance(exercicio, str):
         raise TypeError("esperado uma str para o parâmetro 'exercicio', "
