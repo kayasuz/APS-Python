@@ -8,8 +8,10 @@ import sys
 import math
 # biblioteca do programa
 from package.video import abrir_video, extrair_frames
+from package.exercicios import registrar_exercicio
 
-def contar(video):
+@registrar_exercicio("flexões")
+def contar_flexoes(video):
     """
     Aplica detecção de poses no vídeo passado como parâmetro,
     contando a quantidade de flexões feitas.
