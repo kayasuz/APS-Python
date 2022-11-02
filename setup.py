@@ -6,7 +6,7 @@ setup(
     version="0.0.1",
     python_requires=">=3.6",
     install_requires=["mediapipe"],
-    package_dir={"cntexercicios": "src/cntexercicios"},
+    package_dir={"cntexercicios": "cntexercicios"},
     packages=["cntexercicios", "cntexercicios.exercicios", "cntexercicios.exercicios.flexoes"]
 )
 
