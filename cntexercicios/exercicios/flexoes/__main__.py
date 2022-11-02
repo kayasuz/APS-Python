@@ -6,12 +6,12 @@ if __name__ != "__main__":
 import sys, os
 
 # contador a ser executado
-from package.exercicios.flexoes import contar
+from cntexercicios.exercicios.flexoes import contar
 
 # mostra a ajuda caso necessário
 if len(sys.argv) != 2:
     print(
-        f"usagem: {sys.argv[0]} -m package.exercicios.flexao (arquivo ou índice de dispositivo)\n\n"
+        f"usagem: {sys.argv[0]} -m cntexercicios.exercicios.flexao (arquivo ou índice de dispositivo)\n\n"
          "abre o arquivo de vídeo ou dispositivo indicado\n"
          "por seu índice e conta as flexões"
     )
