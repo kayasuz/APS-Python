@@ -9,6 +9,9 @@ if argumentos:
     parser.print_help()
     exit()
 
+if opcoes.tema is not None and len(opcoes.tema) == 0:
+    opcoes.tema = None
+
 from cntexercicios.dialogos import selecao_exercicio, selecao_video
 exercicio = selecao_exercicio(tema=opcoes.tema)
 if exercicio is not None:
