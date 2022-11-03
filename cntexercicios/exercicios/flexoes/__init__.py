@@ -7,14 +7,16 @@ import os
 import sys
 import math
 # biblioteca do programa
-from package.video import abrir_video, extrair_frames
+from cntexercicios.video import abrir_video, extrair_frames
+from cntexercicios.exercicios import registrar_exercicio
 
-def contar(video):
+@registrar_exercicio("flexões")
+def contar_flexoes(video):
     """
     Aplica detecção de poses no vídeo passado como parâmetro,
     contando a quantidade de flexões feitas.
 
-    Como essa função utiliza a funções do módulo package.video,
+    Como essa função utiliza a funções do módulo cntexercicios.video,
     ela aceita tanto nomes de arquivos de vídeo como índices
     de dispositivos que o opencv-python ou pyopencv podem utilizar
     """
