@@ -1,17 +1,10 @@
 
-# bibliotecas de terceiros
-import cv2
-import mediapipe as mp
-import numpy as np
-# biblioteca padrão
-import os
-import sys
-import math
 # biblioteca do programa
-from cntexercicios.video import abrir_video, extrair_frames
-from cntexercicios.exercicios import registrar_exercicio
+from cntexercicios.exercicios import registrar_exercicio as _registrar_exercicio
 
-@registrar_exercicio("flexões")
+__all__ = ["contar_flexoes"]
+
+@_registrar_exercicio("flexões")
 def contar_flexoes(video):
     """
     Aplica detecção de poses no vídeo passado como parâmetro,
@@ -21,6 +14,15 @@ def contar_flexoes(video):
     ela aceita tanto nomes de arquivos de vídeo como índices
     de dispositivos que o opencv-python ou pyopencv podem utilizar
     """
+
+    # bibliotecas de terceiros
+    import cv2
+    import mediapipe as mp
+    import numpy as np
+    # biblioteca padrão
+    import math
+    # biblioteca do programa
+    from cntexercicios.video import abrir_video, extrair_frames
 
     # variável que traz os modelos do corpo humano
     pose = mp.solutions.pose
