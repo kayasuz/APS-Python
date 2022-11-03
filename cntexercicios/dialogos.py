@@ -25,6 +25,9 @@ class DialogoSelecaoExercicio(ttk.Frame):
                 raise TypeError(
                     "esperado um valor do tipo str ou None para o parâmetro 'tema',"
                     f"recebido um valor do tipo {type(tema).__qualname__}")
+            elif len(tema) == 0:
+                raise ValueError(
+                    "'tema' deve ser uma string de comprimento maior que zero ou None")
             else:
                 self.style.theme_use(tema)
 
@@ -103,6 +106,9 @@ class DialogoSelecaoVideo(ttk.Frame):
                 raise TypeError(
                     "esperado um valor do tipo str ou None para o parâmetro 'tema',"
                     f"recebido um valor do tipo {type(tema).__qualname__}")
+            elif len(tema) == 0:
+                raise ValueError(
+                    "'tema' deve ser uma string de comprimento maior que zero ou None")
             else:
                 self.style.theme_use(tema)
 
