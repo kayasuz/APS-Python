@@ -1,9 +1,19 @@
 
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--tema", action="store", type="string",
+    help="configura o tema a ser usado nas janelas de diálogo")
+
+opcoes, argumentos = parser.parse_args()
+if argumentos:
+    parser.print_help()
+    exit()
+
 from cntexercicios.dialogos import selecao_exercicio, selecao_video
-exercicio = selecao_exercicio()
+exercicio = selecao_exercicio(tema=opcoes.tema)
 if exercicio is not None:
     print(f"exercíco: {exercicio}")
-    video = selecao_video()
+    video = selecao_video(tema=opcoes.tema)
 else:
     video = None
 

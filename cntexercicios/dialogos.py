@@ -7,15 +7,27 @@ except ImportError:
     # python 2.x
     import Tkinter as tkinter
     import Tkinter.filedialog, Tkinter.messagebox
+    from Tkinter import ttk
     del Tkinter
 
-class DialogoSelecaoExercicio(tkinter.Frame):
+class DialogoSelecaoExercicio(ttk.Frame):
     """
     Classe da janela de seleção do exercício a ser contado
     """
 
-    def __init__(self, parent, *exercicios):
+    def __init__(self, parent, *exercicios, tema=None):
         super().__init__(parent)
+
+        # configura o tema da janela
+        self.style = ttk.Style()
+        if tema is not None:
+            if not isinstance(tema, str):
+                raise TypeError(
+                    "esperado um valor do tipo str ou None para o parâmetro 'tema',"
+                    f"recebido um valor do tipo {type(tema).__qualname__}")
+            else:
+                self.style.theme_use(tema)
+
         self.parent = parent
         self.exercicio_selecionado = None
 
@@ -30,7 +42,7 @@ class DialogoSelecaoExercicio(tkinter.Frame):
         for indice, exercicio in enumerate(exercicios):
             # NOTE: o parâmetro "ex" é usado para evitar referenciar uma variável local,
             #       que quando alterada iria alterar a chamada da função lambda
-            btn = tkinter.Button(self, text=exercicio,
+            btn = ttk.Button(self, text=exercicio,
                 command=lambda *ignorado, ex=exercicio: self.selecionar_exercicio(ex)
             )
 
@@ -76,13 +88,24 @@ class DialogoSelecaoExercicio(tkinter.Frame):
         """
         self.parent.destroy()
 
-class DialogoSelecaoVideo(tkinter.Frame):
+class DialogoSelecaoVideo(ttk.Frame):
     """
     Classe para seleção da entrada de vídeo a ser usado para contar os exercícios
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, tema=None):
         super().__init__(parent, borderwidth=4, relief="raised")
+
+        # configura o tema da janela
+        self.style  = ttk.Style()
+        if tema is not None:
+            if not isinstance(tema, str):
+                raise TypeError(
+                    "esperado um valor do tipo str ou None para o parâmetro 'tema',"
+                    f"recebido um valor do tipo {type(tema).__qualname__}")
+            else:
+                self.style.theme_use(tema)
+
         self.parent = parent
         self.video  = None
 
@@ -91,41 +114,41 @@ class DialogoSelecaoVideo(tkinter.Frame):
         self._var_tipo_entrada    = tkinter.IntVar(parent, 0)
 
         # frames
-        self._frame_interno           = tkinter.Frame(self)
-        self._frame_entradas          = tkinter.Frame(self._frame_interno)
-        self._frame_video_arquivo     = tkinter.Frame(self._frame_entradas)
-        self._frame_video_dispositivo = tkinter.Frame(self._frame_entradas)
-        self._frame_espacamento_label = tkinter.Frame(self._frame_video_arquivo, width=15)
+        self._frame_interno           = ttk.Frame(self)
+        self._frame_entradas          = ttk.Frame(self._frame_interno)
+        self._frame_video_arquivo     = ttk.Frame(self._frame_entradas)
+        self._frame_video_dispositivo = ttk.Frame(self._frame_entradas)
+        self._frame_espacamento_label = ttk.Frame(self._frame_video_arquivo, width=15)
 
         # radiobuttons
         from functools import partial
         comando_radiobtn = partial(self._on_mudanca_tipo_entrada, self)
-        self._radiobtn_video_arquivo = tkinter.Radiobutton(
+        self._radiobtn_video_arquivo = ttk.Radiobutton(
             self._frame_entradas, text="arquivo", variable=self._var_tipo_entrada,
             value=0, command=comando_radiobtn
         )
-        self._radiobtn_video_dispositivo = tkinter.Radiobutton(
+        self._radiobtn_video_dispositivo = ttk.Radiobutton(
             self._frame_entradas, text="dispositivo", variable=self._var_tipo_entrada,
             value=1, command=comando_radiobtn
         )
 
         # entrada do índice de dispositivo de vídeo
         callback_validacao = parent.register(self._validar_indice_dispositivo)
-        self._entrada_video_indice = tkinter.Entry(
+        self._entrada_video_indice = ttk.Entry(
             self._frame_video_dispositivo, validate="key", validatecommand=(callback_validacao, "%P"),
             textvariable=self._var_dispositivo_str
         )
 
         # entrada de vídeo como arquivo
-        self._btn_abrir_arquivo = tkinter.Button(
+        self._btn_abrir_arquivo = ttk.Button(
             self._frame_video_arquivo, text="Abrir...", command=self._abrir_arquivo
         )
-        self._label_arquivo = tkinter.Label(
+        self._label_arquivo = ttk.Label(
             self._frame_video_arquivo, width=50, justify="right", anchor="w"
         )
 
         # botão de conclusão
-        self._btn_concluir = tkinter.Button(
+        self._btn_concluir = ttk.Button(
             self._frame_interno, text="Concluir", command=self._concluir
         )
 
@@ -206,7 +229,7 @@ class DialogoSelecaoVideo(tkinter.Frame):
         """
         self.parent.destroy()
 
-def selecao_exercicio():
+def selecao_exercicio(tema=None):
     # listagem de exercícios
     from cntexercicios.exercicios import listar_exercicios
     exercicios = listar_exercicios()
@@ -214,7 +237,7 @@ def selecao_exercicio():
     # janela principal
     app = tkinter.Tk()
     app.title("Seleção do Tipo de Exercício")
-    janela = DialogoSelecaoExercicio(app, *exercicios)
+    janela = DialogoSelecaoExercicio(app, *exercicios, tema=tema)
     janela.pack(expand=True, fill=tkinter.BOTH)
 
     # configuração do tamanho mínimo da janela
@@ -227,11 +250,11 @@ def selecao_exercicio():
 
     return janela.exercicio_selecionado
 
-def selecao_video():
+def selecao_video(tema=None):
     # janela principal
     app = tkinter.Tk()
     app.title("Seleção do Vídeo")
-    janela = DialogoSelecaoVideo(app)
+    janela = DialogoSelecaoVideo(app, tema=tema)
     janela.pack(expand=True, fill=tkinter.BOTH)
 
     # configuração do tamanho mínimo da janela
