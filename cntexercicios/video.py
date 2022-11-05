@@ -50,7 +50,7 @@ def abrir_video(parametro):
     seja possível abrir o arquivo ou dispositivo, um erro do tipo
     RuntimeError será gerado.
 
-    retorna um objeto do tipo ContextoVideoCapture
+    Retorna um objeto do tipo ContextoVideoCapture
     """
     return ContextoVideoCapture(parametro)
 

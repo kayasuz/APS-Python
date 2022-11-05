@@ -20,15 +20,16 @@ def exportar(funcao):
 @exportar
 def registrar_exercicio(nome_exercicio):
     """
-    registra a função seguinte como um contador de exercício
-    usando um decorador, o parâmetro deve ser o nome do exercício,
-    e a função retornada deve ser chamada no contador de exercício
+    Registra a função seguinte como um contador de exercício usando
+    um decorador, o parâmetro deve ser o nome do exercício e a função
+    retornada deve ser chamada no contador de exercício
 
     exemplo:
-
+    ```
     @registrar_exercicio("polichinelo")
     def contar_polichinelos(video):
         ... implementação ...
+    ```
 
     """
 
@@ -46,12 +47,27 @@ def registrar_exercicio(nome_exercicio):
 @exportar
 def listar_exercicios():
     """
-    retorna uma lista de exercícios conhecidos
+    Retorna uma lista dos nomes de exercícios conhecidos, sejam eles registrados
+    pela própria biblioteca, ou por qualquer código que use ela e queira definir
+    um novo contador
     """
     return list(__exercicios.keys())
 
 @exportar
 def contar_exercicios(exercicio, video):
+    """
+    Conta a quantidade de exercícios do tipo feitos no vídeo fornecido
+
+    O exercício passado pelo parâmetro "exercicio" deve ser um nome de exercício
+    conhecido previamente registrado usando o decorador registrar_exercicios
+    (presente no módulo cntexercicios.exercicios), e o vídeo passado pelo parâmetro
+    "video" deve ser um nome de arquivo de vídeo ou um número não negativo representando
+    um índice de dispositivo de captura de vídeo
+
+    Pode gerar uma exceção do tipo ValueError caso o exercício não seja conhecido,
+    ou uma exceção do tipo RuntimeError caso o contador de exercícios gere uma exceção
+    """
+
     # checagem de tipos
     if not isinstance(exercicio, str):
         raise TypeError("esperado uma str para o parâmetro 'exercicio', "

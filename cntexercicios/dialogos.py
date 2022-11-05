@@ -17,7 +17,7 @@ except ImportError:
 
 class DialogoSelecaoExercicio(ttk.Frame):
     """
-    Classe da janela de seleção do exercício a ser contado
+    Classe para criação de um diálogo de seleção de exercício
     """
 
     def __init__(self, parent, *exercicios, tema=None):
@@ -62,7 +62,7 @@ class DialogoSelecaoExercicio(ttk.Frame):
     @staticmethod
     def _estimar_tamanho_grade_botoes(qtd_exercicios):
         """
-        estima as dimensões da grade de botões dada uma quantidade de botões
+        Estima as dimensões da grade de botões dada uma quantidade de botões
         """
         # testa de 1 a 8 colunas (ou até a quantidade de exercícios),
         # retornando as dimensões que minimizam espaços em branco
@@ -90,14 +90,14 @@ class DialogoSelecaoExercicio(ttk.Frame):
 
     def selecionar_exercicio(self, exercicio):
         """
-        seleciona o exercício a ser contado
+        Seleciona o exercício a ser contado
         """
         self.exercicio_selecionado = exercicio
         self.fechar()
 
     def fechar(self, evento=None):
         """
-        fecha a janela principal
+        Fecha a janela principal
         """
         self.parent.destroy()
 
@@ -262,7 +262,7 @@ class DialogoSelecaoVideo(ttk.Frame):
 
     def fechar(self, evento=None):
         """
-        fecha o dialogo
+        Fecha o dialogo
         """
         self.parent.destroy()
 
