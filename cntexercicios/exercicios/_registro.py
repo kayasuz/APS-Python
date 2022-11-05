@@ -83,6 +83,7 @@ def contar_exercicios(exercicio, video):
         # gera uma exceção com 'error' como causa
         raise RuntimeError("falha ao contar o exercício '{}' usando {repr_video} como entrada") from error
 
-# limpeza
+# evite que essa variável seja importada
+# acidentalmente por outros módulos
 del exportar
 

@@ -23,7 +23,7 @@ class DialogoSelecaoExercicio(ttk.Frame):
     def __init__(self, parent, *exercicios, tema=None):
         super().__init__(parent, borderwidth=4, relief="groove")
 
-        # configura o tema da janela
+        # configuração do tema da janela
         self.style = ttk.Style()
         if tema is not None:
             if not isinstance(tema, str):
@@ -36,6 +36,7 @@ class DialogoSelecaoExercicio(ttk.Frame):
             else:
                 self.style.theme_use(tema)
 
+        # atributos da instância
         self.parent = parent
         self.exercicio_selecionado = None
 
@@ -121,22 +122,27 @@ class DialogoSelecaoVideo(ttk.Frame):
             else:
                 self.style.theme_use(tema)
 
+        # atributos da instância visíveis
         self.parent = parent
         self.video  = None
 
+        # variaveis usadas nos widgets
         self._var_arquivo_str     = tkinter.StringVar(parent)
         self._var_dispositivo_str = tkinter.StringVar(parent)
         self._var_tipo_entrada    = tkinter.IntVar(parent, 0)
 
-        # frames
+        # frames diversos
         self._frame_interno           = ttk.Frame(self)
         self._frame_borda_interna     = ttk.Frame(self._frame_interno, borderwidth=4, relief="groove")
         self._frame_entradas          = ttk.Frame(self._frame_borda_interna)
+        # frames onde o vídeo é escolhido
         self._frame_video_arquivo     = ttk.Frame(self._frame_entradas)
         self._frame_video_dispositivo = ttk.Frame(self._frame_entradas)
+        # frame para forçar o espaçamento entre a label
+        # do arquivo selecionado e o botão de seleção de arquivo
         self._frame_espacamento_label = ttk.Frame(self._frame_video_arquivo, width=15)
 
-        # radiobuttons
+        # radiobuttons para seleção do tipo de entrada
         from functools import partial
         comando_radiobtn = partial(self._on_mudanca_tipo_entrada, self)
         self._radiobtn_video_arquivo = ttk.Radiobutton(
@@ -168,18 +174,23 @@ class DialogoSelecaoVideo(ttk.Frame):
             self._frame_interno, text="Concluir", command=self._concluir
         )
 
-        # posição dos widgets
+        # ----- posição dos widgets -----
+
+        # widgets de entrada de vídeo
         self._entrada_video_indice.pack(anchor="e", expand=True, fill="x", side="left")
         self._btn_abrir_arquivo.pack(anchor="w", side="left")
         self._frame_espacamento_label.pack(anchor="center", side="left", expand=True, fill="y")
         self._label_arquivo.pack(anchor="e", side="left", expand=True, fill="x")
 
+        # widgets de seleção do tipo de entrada
         self._radiobtn_video_arquivo.grid(row=0, column=0, sticky="w", padx=10)
         self._radiobtn_video_dispositivo.grid(row=1, column=0, sticky="w", padx=10)
 
+        # frames das entradas de vídeo
         self._frame_video_arquivo.grid(row=0, column=1, sticky="nsew", padx=8, pady=8)
         self._frame_video_dispositivo.grid(row=1, column=1, sticky="nsew", padx=8, pady=8)
 
+        # widgets do frame interno
         self._frame_borda_interna.pack(side="top", anchor="center", expand=True, fill="both", padx=6, pady=6)
         self._btn_concluir.pack(side="top", anchor="s", expand=True, fill="x", padx=8, pady=8)
 
@@ -191,6 +202,7 @@ class DialogoSelecaoVideo(ttk.Frame):
         self.rowconfigure(0, weight=999)
         self.rowconfigure(1, weight=0)
 
+        # frames restantes
         self._frame_entradas.pack(anchor="center", expand=True, fill="both", padx=4, pady=4)
         self._frame_interno.pack(anchor="center", expand=True, fill="both")
 
@@ -200,24 +212,30 @@ class DialogoSelecaoVideo(ttk.Frame):
 
     def _on_mudanca_tipo_entrada(self, *ignorado):
         if self._var_tipo_entrada.get() == 0:
+            # seleção de arquivo de vídeo
             self.focus()
             self._btn_abrir_arquivo.configure(state="normal")
             self._entrada_video_indice.configure(state="disabled")
         else:
+            # seleção de índice de dispositivo de vídeo
             self._btn_abrir_arquivo.configure(state="disabled")
             self._entrada_video_indice.configure(state="normal")
 
     @staticmethod
     def _validar_indice_dispositivo(texto):
+        # valida se o índice de dispositivo fornecido é um número não negativo
         return texto.isdigit() or len(texto) == 0
 
     def _abrir_arquivo(self):
+        # abre um diálogo de seleção de arquivo e
+        # armazena o resultado caso ele seja valido
         arquivo = tkinter.filedialog.askopenfilename()
         if isinstance(arquivo, str):
             self._var_arquivo_str.set(arquivo)
             self._label_arquivo.config(text=f"arquivo: {arquivo}")
 
     def _concluir(self):
+        # verifica o vídeo selecionado e gera uma mensagem de erro caso ele seja inválido
         video = None
         if self._var_tipo_entrada.get() == 0:
             # seleção de arquivo de vídeo

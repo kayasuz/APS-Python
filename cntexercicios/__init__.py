@@ -20,5 +20,5 @@ e o vídeo a ser utilizado para a contagem
 # import dos módulos comumente usados
 from cntexercicios import exercicios
 
-# modulos a serem importados com "from cntexercicios import *"
+# módulos a serem importados com "from cntexercicios import *"
 __all__ = ["exercicios", "dialogos"]
