@@ -1,3 +1,8 @@
+"""
+Módulo contendo os contadores de exercícios dentro de seus próprios módulos
+e funções para listagem dos contadores conhecidos, registro de novos contadores
+e execução dos contadores de exercícios pelo nome do exercício
+"""
 
 # importa as funções de registro e listagem de exercícios
 from cntexercicios.exercicios import _registro

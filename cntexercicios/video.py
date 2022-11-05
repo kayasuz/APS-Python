@@ -1,6 +1,5 @@
 """
-Módulo com funções e classes para auxiliar a entrada de vídeo
-e o processamento de seus frames
+Módulo com funções e classes para auxiliar a entrada de vídeo e o processamento de seus frames
 """
 
 import cv2
@@ -51,7 +50,7 @@ def abrir_video(parametro):
     seja possível abrir o arquivo ou dispositivo, um erro do tipo
     RuntimeError será gerado.
 
-    retorna um objeto do tipo ContextoVideoCapture
+    Retorna um objeto do tipo ContextoVideoCapture
     """
     return ContextoVideoCapture(parametro)
 

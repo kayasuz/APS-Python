@@ -1,3 +1,12 @@
+"""
+Módulo para a contagem de exercícios do tipo "flexão" diretamente pela linha de comando,
+aceita tanto arquivos de vídeo ou índices de dispositivo de captura de vídeo como parâmetro
+
+exemplo de usagem:
+```
+user@localhost: python -m cntexercicio.exercicios.flexao "Vídeos/Treino Flexões.mp4"
+```
+"""
 
 if __name__ != "__main__":
     raise ImportError("esse módulo não deve ser importado diretamente")
