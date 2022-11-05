@@ -1,6 +1,5 @@
 """
-Módulo com funções e classes para auxiliar a entrada de vídeo
-e o processamento de seus frames
+Módulo com funções e classes para auxiliar a entrada de vídeo e o processamento de seus frames
 """
 
 import cv2
