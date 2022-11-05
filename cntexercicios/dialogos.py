@@ -16,7 +16,7 @@ class DialogoSelecaoExercicio(ttk.Frame):
     """
 
     def __init__(self, parent, *exercicios, tema=None):
-        super().__init__(parent)
+        super().__init__(parent, borderwidth=4, relief="groove")
 
         # configura o tema da janela
         self.style = ttk.Style()
@@ -51,7 +51,7 @@ class DialogoSelecaoExercicio(ttk.Frame):
 
             # linha=quociente, coluna=resto
             linha, coluna = divmod(indice, colunas)
-            btn.grid(row=linha, column=coluna, padx=10, pady=10, sticky=tkinter.EW)
+            btn.grid(row=linha, column=coluna, padx=8, pady=8, sticky=tkinter.EW)
 
     @staticmethod
     def _estimar_tamanho_grade_botoes(qtd_exercicios):
@@ -97,7 +97,7 @@ class DialogoSelecaoVideo(ttk.Frame):
     """
 
     def __init__(self, parent, tema=None):
-        super().__init__(parent, borderwidth=4, relief="raised")
+        super().__init__(parent, borderwidth=4, relief="groove")
 
         # configura o tema da janela
         self.style  = ttk.Style()
@@ -121,7 +121,8 @@ class DialogoSelecaoVideo(ttk.Frame):
 
         # frames
         self._frame_interno           = ttk.Frame(self)
-        self._frame_entradas          = ttk.Frame(self._frame_interno)
+        self._frame_borda_interna     = ttk.Frame(self._frame_interno, borderwidth=4, relief="groove")
+        self._frame_entradas          = ttk.Frame(self._frame_borda_interna)
         self._frame_video_arquivo     = ttk.Frame(self._frame_entradas)
         self._frame_video_dispositivo = ttk.Frame(self._frame_entradas)
         self._frame_espacamento_label = ttk.Frame(self._frame_video_arquivo, width=15)
@@ -164,21 +165,24 @@ class DialogoSelecaoVideo(ttk.Frame):
         self._frame_espacamento_label.pack(anchor="center", side="left", expand=True, fill="y")
         self._label_arquivo.pack(anchor="e", side="left", expand=True, fill="x")
 
-        self._radiobtn_video_arquivo.grid(row=0, column=0, sticky="w", padx=5)
-        self._radiobtn_video_dispositivo.grid(row=1, column=0, sticky="w", padx=5)
+        self._radiobtn_video_arquivo.grid(row=0, column=0, sticky="w", padx=10)
+        self._radiobtn_video_dispositivo.grid(row=1, column=0, sticky="w", padx=10)
 
-        self._frame_video_arquivo.grid(row=0, column=1, sticky="ew", padx=5, pady=5)
-        self._frame_video_dispositivo.grid(row=1, column=1, sticky="ew", padx=5, pady=5)
+        self._frame_video_arquivo.grid(row=0, column=1, sticky="nsew", padx=8, pady=8)
+        self._frame_video_dispositivo.grid(row=1, column=1, sticky="nsew", padx=8, pady=8)
 
-        self._frame_entradas.pack(side="top", anchor="n", expand=True, fill="both", padx=5, pady=5)
-        self._btn_concluir.pack(side="top", anchor="s", expand=True, fill="x", padx=5, pady=5)
+        self._frame_borda_interna.pack(side="top", anchor="center", expand=True, fill="both", padx=6, pady=6)
+        self._btn_concluir.pack(side="top", anchor="s", expand=True, fill="x", padx=8, pady=8)
 
         # ajuste das colunas quando a janela for redimensionada
         self._frame_entradas.columnconfigure(0, weight=0,   minsize=25)
         self._frame_entradas.columnconfigure(1, weight=999, minsize=150)
+        self._frame_entradas.rowconfigure(0, weight=1)
+        self._frame_entradas.rowconfigure(1, weight=1)
         self.rowconfigure(0, weight=999)
         self.rowconfigure(1, weight=0)
 
+        self._frame_entradas.pack(anchor="center", expand=True, fill="both", padx=4, pady=4)
         self._frame_interno.pack(anchor="center", expand=True, fill="both")
 
         # configura o estado inicial da janela
