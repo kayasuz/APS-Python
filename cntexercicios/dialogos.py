@@ -63,15 +63,19 @@ class DialogoSelecaoExercicio(ttk.Frame):
         import math
         sobra_minima   = None
         tamanho_minimo = None
+        razao_minima   = None
         for colunas in range(1, min(qtd_exercicios, 8)+1):
             linhas   = int(math.ceil(qtd_exercicios / colunas))
             sobrando = linhas * colunas - qtd_exercicios
+            razao    = max((linhas, colunas)) / min((linhas, colunas))
             # atualiza o tamanho mínimo que minimiza os espaços em branco
             if sobrando < 0:
                 raise RuntimeError("erro de cálculo")
-            if sobra_minima is None or sobra_minima > sobrando:
-                sobra_minma    = sobrando
+            if (sobra_minima is None or sobra_minima > sobrando or
+                (sobra_minima == sobrando and razao_minima > razao)):
+                sobra_minima    = sobrando
                 tamanho_minimo = (linhas, colunas)
+                razao_minima   = razao
 
         if tamanho_minimo is not None:
             return tamanho_minimo
