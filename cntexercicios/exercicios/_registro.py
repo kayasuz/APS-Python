@@ -1,3 +1,13 @@
+"""
+Módulo interno para o registro, listagem e execução de contadores de exercícios,
+não deve ser importado diretamente, ao invés disso use o módulo cntexercicios.exercicios
+que importa as funções desse módulo para que elas sejam usadas pelo resto da biblioteca
+
+Contém funções para registrar contadores de exercícios com base
+no nome do exercício, listagem dos nomes de exercícios já registrados,
+e execução dos contadores apenas com o nome do exercício, sem precisar
+saber o nome da função ou o módulo onde ela reside
+"""
 
 __exercicios = {}
 

@@ -1,3 +1,8 @@
+"""
+Módulo para geração de diálogos usando a biblioteca padrão tkinter
+para que o usuário selecione um tipo de exercício, arquivo de vídeo
+ou dispositívos de captura de vídeo
+"""
 
 # importação da biblioteca tkinter
 try:

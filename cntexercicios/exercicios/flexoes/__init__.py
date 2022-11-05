@@ -1,3 +1,8 @@
+"""
+Módulo contendo um contador de exercícios para a contagem de flexões,
+é recomendado que não se utilize a função diretamente, mas sim a função
+contar_exercicios do módulo cntexercicios.exercicios
+"""
 
 # biblioteca do programa
 from cntexercicios.exercicios import registrar_exercicio as _registrar_exercicio
