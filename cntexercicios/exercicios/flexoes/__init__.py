@@ -15,6 +15,8 @@ class ContadorFlexoes(ContadorExercicios):
     LIMIAR_EXERCICIO_MIN = 0.30
     LIMIAR_EXERCICIO_MAX = 0.40
 
+    NOME_EXERCICIO = "flexões"
+
     def _calc_progresso_exercicio(self):
         # cálculo vetorial e algébrico
         import math

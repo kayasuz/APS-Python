@@ -10,6 +10,8 @@ import cv2
 
 class ContadorExercicios(ABC):
 
+    registro = {}
+
     LIMIAR_EXERCICIO_MIN = 0.25
     LIMIAR_EXERCICIO_MAX = 0.75
 
@@ -137,6 +139,32 @@ class ContadorExercicios(ABC):
     @abstractmethod
     def _calc_progresso_exercicio(self, frame):
         pass
+
+def listar_contadores():
+    """
+    Retorna uma lista dos nomes de exercícios conhecidos que possuem uma classe contadora,
+    ou seja, uma subclasse da classe ContadorExercicios que implemente a contagem de um
+    determinado tipo de exercício físico
+    """
+    return list(ContadorExercicios.registro.keys())
+
+def buscar_contador(exercicio):
+    """
+    Procura nas subclasses da classe ContadorExercicios uma classe que implemente o contador
+    para o exercício físico especificado, retornando None caso a classe não seja encontrada
+    """
+    return ContadorExercicios.registro.get(exercicio, None)
+
+def instanciar_contador(exercicio, *args, **kwargs):
+    """
+    Cria uma nova instância de contador para o exercício físico especificado, usa internamente
+    a função buscar_contador para procurar a classe que implementa o contador desejado
+    """
+    classe = buscar_contador(exercicio)
+    if classe is None:
+        raise ValueError(f"contador para o tipo de exercício '{exercicio}' não encontrado")
+
+    return classe(*args, **kwargs)
 
 # importa as funções de registro e listagem de exercícios
 from cntexercicios.exercicios import _registro
