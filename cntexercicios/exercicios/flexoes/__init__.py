@@ -11,6 +11,9 @@ from cntexercicios.exercicios import ContadorExercicios
 __all__ = ["contar_flexoes"]
 
 class ContadorFlexoes(ContadorExercicios):
+    """
+    Contador de flexões em vídeos utilizando a classe ContadorExercicios como base
+    """
 
     LIMIAR_EXERCICIO_MIN = 0.30
     LIMIAR_EXERCICIO_MAX = 0.40
@@ -18,6 +21,9 @@ class ContadorFlexoes(ContadorExercicios):
     NOME_EXERCICIO = "flexões"
 
     def _calc_progresso_exercicio(self):
+        """
+        Calcula o progresso da flexão utilizando os pontos do corpo detectados pela classe base
+        """
         # cálculo vetorial e algébrico
         import math
         import numpy as np
@@ -65,7 +71,7 @@ class ContadorFlexoes(ContadorExercicios):
                     np.linalg.norm(pos_pescoco - pos_centro_pes))
 
                 return h_flexao, True
-        
+
         return 0, False
 
 @_registrar_exercicio("flexões")

@@ -9,6 +9,13 @@ from abc import ABC, abstractmethod
 import cv2
 
 class ContadorExercicios(ABC):
+    """
+    Classe base abstrata para a implementação de classes contadoras de exercícios,
+    com os requisitos mínimos de implementar a função _calc_progresso_exercicio,
+    utilizada para saber o progresso de um exercício físico em um vídeo, e declaração
+    do atributo de classe "NOME_EXERCICIO" contendo o nome do exercício contado
+    pela classe
+    """
 
     registro = {}
 
@@ -18,6 +25,9 @@ class ContadorExercicios(ABC):
     FONTE_PADRAO = cv2.FONT_HERSHEY_SIMPLEX
 
     def __init_subclass__(cls, *args, **kwargs):
+        """
+        Registra novas classes de contagem de exercícios pela detecção da herança
+        """
         # previne herança em classes sem um nome de exercício
         if not hasattr(cls, "NOME_EXERCICIO"):
             raise TypeError(
@@ -37,6 +47,12 @@ class ContadorExercicios(ABC):
         ContadorExercicios.registro[cls.NOME_EXERCICIO] = cls
 
     def __init__(self, video, titulo=None):
+        """
+        Cria um contador de exercícios para a contagem no vídeo fornecido pelo parâmetro "video",
+        o título da janela mostrando o vídeo pode ser passado pelo parâmetro "título", NÃO UTILIZE
+        títulos com acentuação, isso pode fazer com que a janela não seja criada e o contador falhe
+        """
+
         if titulo is None:
             titulo = "Contador"
         elif not isinstance(titulo, str):
@@ -70,11 +86,17 @@ class ContadorExercicios(ABC):
         self._estado_exercicio = False
 
     def contar(self):
+        """
+        Faz a contagem dos exercícios no vídeo, chamando funções internas para
+        detectar o corpo da pessoa, contar o exercício, renderizar a janela,
+        processar eventos e detectar quando a janela é fechada
+        """
         from cntexercicios.video import abrir_video, extrair_frames
 
         # processa os frames do vídeo, contando o exercício
         with abrir_video(self._video) as captura:
             for frame in extrair_frames(captura):
+                # faz a deteção do corpo da pessoa presente no vídeo
                 self._detectar_corpo(frame)
                 # detecta a transição entre estados do exercício,
                 # aumentando a contagem dele em cada ciclo completo
@@ -89,6 +111,10 @@ class ContadorExercicios(ABC):
         return self._contagem
 
     def _detectar_corpo(self, frame):
+        """
+        Utiliza a biblioteca mediapipe para detecção dos pontos do corpo
+        da pessoa presente no frame fornecido, salvando eles no contador
+        """
         # processamento dos pontos do corpo humano
         self._corpo  = self._pose.process(frame)
         self._pontos = self._corpo.pose_landmarks
@@ -100,6 +126,10 @@ class ContadorExercicios(ABC):
         return np.array((ponto.x, 1-ponto.y, ponto.z))
 
     def _contar_exercicio(self):
+        """
+        Faz a contagem dos exercícios utilizando a função de cálculo do progresso
+        do exercício para detectar a transição de estados no exercício
+        """
         # evita contar exercícios caso um corpo não seja detectado
         if not self._pontos:
             return
@@ -120,6 +150,10 @@ class ContadorExercicios(ABC):
             self._estado_exercicio = False
 
     def _renderizar_janela(self, frame):
+        """
+        Renderiza a janela utilizando o frame fornecido como base,
+        adicionando a contagem de exercícios a ele
+        """
         # renderização de textos
         cv2.putText(frame, f"Contagem: {self._contagem}", (40, 50),
             self._fonte, self._tamanho_fonte, self._cor_fonte, self._grossura_fonte)
@@ -128,9 +162,15 @@ class ContadorExercicios(ABC):
         cv2.imshow(self._titulo, frame)
 
     def _processar_eventos(self):
+        """
+        Processa eventos de janela do OpenCV
+        """
         tecla = cv2.waitKey(2)
 
     def _janela_fechada(self):
+        """
+        Detecta se a janela foi fechada
+        """
         if cv2.getWindowProperty(self._titulo, cv2.WND_PROP_VISIBLE) < 1:
             return True
         else:
@@ -138,6 +178,10 @@ class ContadorExercicios(ABC):
 
     @abstractmethod
     def _calc_progresso_exercicio(self, frame):
+        """
+        Esse método deve ser implementado em subclasses para
+        calcular o progresso entre estados do exercício sendo
+        """
         pass
 
 def listar_contadores():
