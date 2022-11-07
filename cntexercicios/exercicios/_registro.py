@@ -1,4 +1,8 @@
 """
+Aviso: esso módulo foi depreciado e será removido em uma versão futura,
+a nova classe ContadorExercicios do módulo cntexercicios.exercicios deverá
+ser usada na implementação de contadores de exercícios de agora em diante
+
 Módulo interno para o registro, listagem e execução de contadores de exercícios,
 não deve ser importado diretamente, ao invés disso use o módulo cntexercicios.exercicios
 que importa as funções desse módulo para que elas sejam usadas pelo resto da biblioteca
@@ -20,6 +24,11 @@ def exportar(funcao):
 @exportar
 def registrar_exercicio(nome_exercicio):
     """
+    Aviso: essa função foi depreciada em favor da implementação de uma classe
+    contadora de exercícios, que deverá herdar a classe ContadorExercicios.
+    Suporte à contagem de exercícios baseada em funções será removido
+    em uma versão futura
+
     Registra a função seguinte como um contador de exercício usando
     um decorador, o parâmetro deve ser o nome do exercício e a função
     retornada deve ser chamada no contador de exercício
@@ -40,6 +49,14 @@ def registrar_exercicio(nome_exercicio):
     def decorador(funcao):
         global __exercicios
         __exercicios[nome_exercicio] = funcao
+
+        # aviso de depreciação (será removido no release após o release atual)
+        import warnings
+        warnings.warn(
+            "funções de contagem estão sendo depreciadas e não vão ser mais suportadas, "
+            "uma subclasse da classe ContadorExercicios deve ser implementada ao invés disso",
+            DeprecationWarning, stacklevel=2
+        )
         return funcao
 
     return decorador
@@ -56,6 +73,11 @@ def listar_exercicios():
 @exportar
 def contar_exercicios(exercicio, video):
     """
+    Aviso: essa função foi depreciada em favor da utilização de contadores
+    de exercícios implementados como classes, que devem herdar a classe
+    ContadorExercicios. Suporte à contagem de exercícios baseada em funções
+    será removido em uma versão futura
+
     Conta a quantidade de exercícios do tipo feitos no vídeo fornecido
 
     O exercício passado pelo parâmetro "exercicio" deve ser um nome de exercício
