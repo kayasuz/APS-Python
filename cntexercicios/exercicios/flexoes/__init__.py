@@ -54,8 +54,6 @@ def contar_flexoes(video):
             points = results.pose_landmarks
             # desenho das linhas entre os pontos do corpo
             draw.draw_landmarks(img,points,pose.POSE_CONNECTIONS)
-            # variáveis da altura,largura e numero de canais da imagem
-            h, w, _ = img.shape
 
             # faz o processamento dos pontos caso um corpo seja detectado
             if points:
