@@ -145,3 +145,57 @@ def convolucao(imagem, kernel, reduzir=False):
 
 	# trunca o resultado e retorna
 	return saida.astype(np.uint8)
+
+def kernel_nitidez(peso=1):
+	if isinstance(peso, int):
+		dtype = int
+	elif isinstance(peso, float):
+		dtype = float
+	else:
+		raise TypeError(f"esperado int ou float para 'peso', recebido tipo {type(peso).__qualname__}")
+	if peso < 0:
+		raise ValueError("'peso' não pode ser um número negativo")
+
+	a = -peso
+	b = 1 + 4 * peso
+	return np.array([
+		[0, a, 0],
+		[a, b, a],
+		[0, a, 0]
+	], dtype=dtype)
+
+def kernel_deteccao_borda():
+	return np.array([
+		[-1, -1, -1 ],
+		[-1,  8, -1 ],
+		[-1, -1, -1 ],
+	], dtype=int)
+
+def kernel_gauss(tamanho=None, sigma=1):
+	if tamanho is None:
+		tamanho = 3
+	elif not isinstance(tamanho, int) or isinstance(tamanho, bool):
+		raise TypeError(
+			f"esperado int ou None para 'tamanho', recebido tipo {type(tamanho).__qualname__}"
+		)
+	elif tamanho < 1:
+		raise TypeError(f"'tamanho' deve ser um númeor positivo diferente de zero")
+	elif tamanho > 32:
+		# tamanho limitado por causa da precisão do algorítimo de geração do kernel
+		raise TypeError(f"tamanho não suportado")
+	if not isinstance(sigma, (int, float)):
+		raise TypeError(f"esperado int ou float para 'sigma', recebido tipo {type(sigma).__qualname__}")
+	if sigma < 0:
+		raise ValueError(f"'sigma' não pode ser um número negativo")
+
+	# distribuição normal em uma dimensão
+	x = np.linspace(-(tamanho // 2), tamanho // 2, tamanho)
+	x = (1 / (np.sqrt(2 * np.pi) * sigma)) * np.e ** (-np.power(x / sigma, 2) / 2)
+
+	# extensão da distribuição fazendo o produto externo
+	kernel = np.outer(x.T, x.T)
+
+	# corrige kernel para que a soma dos valores seja 1
+	# (evitando que a imagem escureça) e retorna o resultado
+	kernel /= kernel.sum()
+	return kernel
