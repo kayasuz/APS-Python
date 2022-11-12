@@ -124,16 +124,35 @@ def convolucao(imagem, kernel, reduzir=False):
 	else:
 		dims_saida = (f_w - espacamento_x, f_h - espacamento_y, *dim_extras)
 
-	# aplica o kernel
-	# NOTE: isso pode provavelmente ser otimizado operando o kernel inteiro de uma vez,
-	#       talvez com uma view ou o método numpy.broadcast
+	# calcula o tipo apropriado para utilizar no buffer intermediário
 	if np.issubdtype(kernel.dtype, np.floating):
-		dtype=float
+		dtype = float
+
 	elif np.issubdtype(kernel.dtype, np.integer):
-		dtype=int
+		vmax_a = np.sum(255 * np.clip(kernel, 0, np.inf).astype(float))
+		vmax_b = -np.sum(255 * np.clip(kernel, -np.inf, 0).astype(float))
+		vmax = max(vmax_a, vmax_b)
+		# checagem de sinal
+		if kernel.min() >= 0:
+			if vmax > ((1 << 64) - 1):
+				# overflow provável, use floats no cálculo pra prevenir erros
+				dtype = float
+			else:
+				# sem risco de overflow, use unsigned ints para acelerar as contas
+				dtype = np.uint64
+
+		elif vmax > ((1 << 63) - 1):
+			# overflow provável, use floats no cálculo pra prevenir erros
+			dtype = float
+		else:
+			# sem risco de overflow, use ints para acelerar as contas
+			dtype = np.int64
 	else:
 		raise ValueError(f"kernel de imagem inválido, tipo não suportado: {kernel.dtype}")
 
+	# aplica o kernel
+	# NOTE: isso pode provavelmente ser otimizado operando o kernel inteiro de uma vez,
+	#       talvez com uma view ou o método numpy.broadcast
 	saida  = np.zeros(dims_saida, dtype=dtype)
 	buffer = np.zeros(dims_saida, dtype=dtype)
 	for j in range(k_h):
@@ -144,7 +163,7 @@ def convolucao(imagem, kernel, reduzir=False):
 			saida += buffer
 
 	# trunca o resultado e retorna
-	return saida.astype(np.uint8)
+	return np.clip(saida, 0, 255).astype(np.uint8)
 
 def kernel_nitidez(peso=1):
 	if isinstance(peso, int):
