@@ -22,11 +22,18 @@ class ContadorExercicios(ABC):
     pela classe
     """
 
+    # registro de subclasses associadas a cada exercício
     registro = {}
 
     LIMIAR_EXERCICIO_MIN = 0.25
     LIMIAR_EXERCICIO_MAX = 0.75
 
+    # índices dos filtros de vídeo para aplicação deles em ordem crescente
+    FILTRO_NITIDEZ_IDX = 0
+    FILTRO_GAUSS_IDX   = 1
+    FILTRO_BORDAS_IDX  = 2
+
+    # constantes que afetam a aparência dos textos
     FONTE_PADRAO = cv2.FONT_HERSHEY_SIMPLEX
 
     def __init_subclass__(cls, *args, **kwargs):
@@ -58,6 +65,7 @@ class ContadorExercicios(ABC):
         títulos com acentuação, isso pode fazer com que a janela não seja criada e o contador falhe
         """
 
+        # checagem de parâmetros
         if titulo is None:
             titulo = "Contador"
         elif not isinstance(titulo, str):
@@ -71,6 +79,22 @@ class ContadorExercicios(ABC):
         # atributos genéricos
         self._titulo = titulo
         self._video  = video
+
+        # atributos relacionados aos filtros
+        from cntexercicios.filtros import kernel_nitidez, kernel_gauss, kernel_deteccao_borda
+        self._filtros          = [None] * 3
+        self._filtros_ativos   = [False] * 3
+        self._filtro_contraste = False
+        self._mostrar_filtro   = False
+
+        # parâmetros dos filtros
+        self._peso  = 0.5
+        self._sigma = 1
+
+        # configura os filtros
+        self._filtros[self.FILTRO_NITIDEZ_IDX] = kernel_nitidez(peso=self._peso)
+        self._filtros[self.FILTRO_GAUSS_IDX]   = kernel_gauss(3, sigma=self._sigma)
+        self._filtros[self.FILTRO_BORDAS_IDX]  = kernel_deteccao_borda()
 
         # atributos relacionado as poses
         self._pose = mp.solutions.pose.Pose(
@@ -101,12 +125,18 @@ class ContadorExercicios(ABC):
         # processa os frames do vídeo, contando o exercício
         with abrir_video(self._video) as captura:
             for frame in extrair_frames(captura):
+                # aplica os filtros ativos no frame
+                frame_filtrado = self._aplicar_filtros(frame)
                 # faz a detecção do corpo da pessoa presente no vídeo
-                self._detectar_corpo(frame)
+                self._detectar_corpo(frame_filtrado)
                 # detecta a transição entre estados do exercício,
                 # aumentando a contagem dele em cada ciclo completo
                 self._contar_exercicio()
-                self._renderizar_janela(frame)
+                if self._mostrar_filtro:
+                    self._renderizar_janela(frame_filtrado)
+                else:
+                    self._renderizar_janela(frame)
+
                 self._processar_eventos()
                 # verifica se o usuário fechou a janela
                 if self._janela_fechada():
@@ -114,6 +144,25 @@ class ContadorExercicios(ABC):
 
         # retorne o resultado
         return self._contagem
+
+    def _aplicar_filtros(self, frame):
+        # coleta os filtros a serem aplicados
+        indices = [idx for idx, ativo in enumerate(self._filtros_ativos) if ativo]
+        filtros = [self._filtros[idx] for idx in indices]
+
+        # aplica o filtro de contraste primeiro
+        if self._filtro_contraste:
+            from cntexercicios.filtros import melhorar_contraste
+            frame = melhorar_contraste(frame)
+
+        # aplica os filtros ativos em sequência
+        if filtros:
+            from cntexercicios.filtros import convolucao
+            for kernel in filtros:
+                frame = convolucao(frame, kernel)
+
+        # retorna o frame filtrado
+        return frame
 
     def _detectar_corpo(self, frame):
         """
@@ -170,7 +219,65 @@ class ContadorExercicios(ABC):
         """
         Processa eventos de janela do OpenCV
         """
-        tecla = cv2.waitKey(2)
+        tecla = (cv2.waitKey(2) & 0xFF)
+
+        # ativa/desativa a visualização dos filtros
+        if tecla in (ord("f"), ord("F")):
+            novo_estado = not self._mostrar_filtro
+            self._mostrar_filtro = novo_estado
+            print(f"visualização de filtros {'ativa' if novo_estado else 'inativa'}")
+
+        # ativa/desativa o filtro de melhoria contraste
+        elif tecla in (ord("c"), ord("C")):
+            novo_estado = not self._filtro_contraste
+            self._filtro_contraste = novo_estado
+            print(f"melhoria de contraste {'ativa' if novo_estado else 'inativa'}")
+
+        # ativa/desativa o filtro de borrão gaussiano
+        elif tecla in (ord("g"), ord("G")):
+            novo_estado = not self._filtros_ativos[self.FILTRO_GAUSS_IDX]
+            self._filtros_ativos[self.FILTRO_GAUSS_IDX] = novo_estado
+            print(f"filtro gaussiano {'ativo' if novo_estado else 'inativo'}")
+
+        # ativa/desativa o filtro de melhoria de nitidez
+        elif tecla in (ord("n"), ord("N")):
+            novo_estado = not self._filtros_ativos[self.FILTRO_NITIDEZ_IDX]
+            self._filtros_ativos[self.FILTRO_NITIDEZ_IDX] = novo_estado
+            print(f"realçamento de nitidez {'ativo' if novo_estado else 'inativo'}")
+
+        # ativa/desativa o filtro de detecção de bordas
+        elif tecla in (ord("b"), ord("B")):
+            novo_estado = not self._filtros_ativos[self.FILTRO_BORDAS_IDX]
+            self._filtros_ativos[self.FILTRO_BORDAS_IDX] = novo_estado
+            print(f"deteção de bordas {'ativa' if novo_estado else 'inativa'}")
+
+        # diminui o peso do kernel de nitidez
+        elif tecla == ord("1"):
+            from cntexercicios.filtros import kernel_nitidez
+            self._peso = round(max(0, min(self._peso - 0.05, 1)), 3)
+            print(f"nitidez (peso): {self._peso}")
+            self._filtros[self.FILTRO_NITIDEZ_IDX] = kernel_nitidez(peso=self._peso)
+
+        # aumenta o peso do kernel de nitidez
+        elif tecla == ord("2"):
+            from cntexercicios.filtros import kernel_nitidez
+            self._peso = round(max(0, min(self._peso + 0.05, 1)), 3)
+            print(f"nitidez (peso): {self._peso}")
+            self._filtros[self.FILTRO_NITIDEZ_IDX] = kernel_nitidez(peso=self._peso)
+
+        # diminui o desvio padrão do kernel de borragem gaussiana
+        elif tecla == ord("3"):
+            from cntexercicios.filtros import kernel_gauss
+            self._sigma = round(max(0, min(self._sigma - 0.1, 10)), 2)
+            print(f"gauss (sigma): {self._sigma}")
+            self._filtros[self.FILTRO_GAUSS_IDX] = kernel_gauss(3, sigma=self._sigma)
+
+        # aumenta o desvio padrão do kernel de borragem gaussiana
+        elif tecla == ord("4"):
+            from cntexercicios.filtros import kernel_gauss
+            self._sigma = round(max(0, min(self._sigma + 0.1, 10)), 2)
+            print(f"gauss (sigma): {self._sigma}")
+            self._filtros[self.FILTRO_GAUSS_IDX] = kernel_gauss(3, sigma=self._sigma)
 
     def _janela_fechada(self):
         """
