@@ -79,6 +79,8 @@ class ContadorExercicios(ABC):
         # atributos genéricos
         self._titulo = titulo
         self._video  = video
+        self._pausa  = False
+        self._frame  = None
 
         # atributos relacionados aos filtros
         from cntexercicios.filtros import kernel_nitidez, kernel_gauss, kernel_deteccao_borda
@@ -124,7 +126,19 @@ class ContadorExercicios(ABC):
 
         # processa os frames do vídeo, contando o exercício
         with abrir_video(self._video) as captura:
-            for frame in extrair_frames(captura):
+            frame_gen = extrair_frames(captura)
+
+            while True:
+                if self._pausa:
+                    frame = self._frame
+                else:
+                    try:
+                        frame = next(frame_gen)
+                    except StopIteration:
+                        break
+                    else:
+                        self._frame = frame
+
                 # aplica os filtros ativos no frame
                 frame_filtrado = self._aplicar_filtros(frame)
                 # faz a detecção do corpo da pessoa presente no vídeo
@@ -221,8 +235,12 @@ class ContadorExercicios(ABC):
         """
         tecla = (cv2.waitKey(2) & 0xFF)
 
+        # pausa do vídeo
+        if tecla in (ord("p"), ord("P"), ord(" ")):
+            self._pausa = not self._pausa
+
         # ativa/desativa a visualização dos filtros
-        if tecla in (ord("f"), ord("F")):
+        elif tecla in (ord("f"), ord("F")):
             novo_estado = not self._mostrar_filtro
             self._mostrar_filtro = novo_estado
             print(f"visualização de filtros {'ativa' if novo_estado else 'inativa'}")
