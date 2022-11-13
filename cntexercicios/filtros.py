@@ -13,6 +13,60 @@ def espelhamento_horizontal(imagem):
 	"""
 	return imagem[..., ::-1]
 
+def melhorar_contraste(imagem):
+	kr, kg, kb = (0.299, 0.587, 0.114)
+	"""
+	conversão RGB/BGR -> YPrPb
+	Y  = Kr * R + Kg * G + Kb * B
+	Pr = 1/2 * (B - Y) / (1 - Kb)
+	Pb = 1/2 * (R - Y) / (1 - Kr)
+
+	como os canais Pr e Pb não são alterados durante o ajuste de contraste,
+	os valores adicionados aos canais B, G e R podem ser calculados:
+
+	Pr = 1/2 * (Bi - Yi) / (1 - Kb) = 1/2 * (Bf - Yf) / (1 - Kb)
+	Pb = 1/2 * (Ri - Yi) / (1 - Kr) = 1/2 * (Rf - Yf) / (1 - Kr)
+
+	Bi - Yi = Bf - Yf
+	Ri - Yi = Rf - Yf
+
+	Bf - Bi = Yf - Yi
+	Rf - Ri = Yf - Yi
+
+	dB = dR = dY
+
+	dY = Yf - Yi = (Kr * Rf + Kg * Gf + Kb * Bf) - (Kr * Ri + Kg * Gi + Kb * Bi)
+	dY = Kr * dR + Kg * dG + Kb * dB
+	dG = (dY - Kr * dR - Kb * dB) / Kg
+	dG = dY * (1 - Kr - Kb) / Kg
+
+	onde dB, dG, dR e dY são os valores adicionados ou subtraídos dos canais
+	B, G, R e Y respectivamente após o ajuste de contraste, Yi, Ri, Bi são
+	os valores iniciais dos canais Y, R e B, e Yf, Rf e Bf são os valores
+	finais dos canais Y, R e B.
+	"""
+	# NOTE: como as constantes foram escolhidas para gerar valores
+	#       no intervalo de 0 a 255, é seguro usar o truncamento
+	Yi = np.dot(imagem, (kb, kg, kr)).astype(np.uint8)
+
+	# correção na luminância
+	ymin, ymax = Yi.min(), Yi.max()
+	Yf = ((255 * (Yi - ymin).astype(int)) / (ymax - ymin)).astype(np.uint8)
+
+	# cálculo da mudança dos níveis dos canais
+	dR = dB = dY = np.subtract(Yf, Yi, dtype=np.int16)
+	dG = dY * (1 - kr - kb) / kg
+	np.clip(dG, -255, 255, out=dG)
+	dG = dG.astype(np.int16)
+
+	# aplicação das mudanças na imagem
+	resultado = imagem.astype(np.int16)
+	np.add(dB, resultado[..., 0], out=resultado[..., 0])
+	np.add(dG, resultado[..., 1], out=resultado[..., 1])
+	np.add(dR, resultado[..., 2], out=resultado[..., 2])
+	np.clip(resultado, 0, 255, out=resultado)
+	return resultado.astype(np.uint8)
+
 def estender_com_zeros(imagem, tamanho=None):
 	"""
 	Estende a imagem com zeros nas bordas
