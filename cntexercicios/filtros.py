@@ -158,7 +158,7 @@ def convolucao(imagem, kernel, reduzir=False):
 	for j in range(k_h):
 		for i in range(k_w):
 			# multiplicação sem alocação de um novo array
-			np.multiply(kernel[i,j], imagem[i:(f_w+i), j:(f_h+j)], out=buffer)
+			np.multiply(kernel[i,j], imagem[i:(f_w+i), j:(f_h+j)], out=buffer, dtype=dtype)
 			# adiciona o resultado parcial à saída
 			saida += buffer
 
