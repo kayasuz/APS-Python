@@ -108,9 +108,9 @@ class ContadorExercicios(ABC):
 
         # atributos de renderização do texto
         self._fonte          = cv2.FONT_HERSHEY_SIMPLEX
-        self._tamanho_fonte  = 1
-        self._cor_fonte      = (255, 200, 255)
-        self._grossura_fonte = 3
+        self._tamanho_fonte  = 0.60
+        self._cor_fonte      = (0, 0, 0)
+        self._grossura_fonte = 2
 
         # atributos de contagem de exercícios
         self._contagem = 0
