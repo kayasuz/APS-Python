@@ -76,5 +76,5 @@ class ContadorFlexoes(ContadorExercicios):
 
 @_registrar_exercicio("flexões")
 def contar_flexoes(video):
-    contador = ContadorFlexoes("Resultado", video)
+    contador = ContadorFlexoes(video, titulo="Resultado")
     contador.contar()
