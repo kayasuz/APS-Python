@@ -1,19 +1,42 @@
+"""
+Módulo com funções de filtragem e convolução de kernels em imagens,
+assim como funções para gerar alguns tipos de kernels
+
+As funções desse módulo operam em imagens assumindo que elas (e os kernels)
+sejam arrays da biblioteca numpy (numpy.ndarray), ou listas ou tuplas convertíveis
+para esses arrays
+"""
 
 import numpy as np
 
 def espelhamento_vertical(imagem):
 	"""
-	Espelha a imagem na vertical
+	Espelha a imagem fornecida pelo eixo horizontal, invertendo a orientação
+	do eixo vertical, idependete dos canais presentes na imagem, assume que o
+	eixo horizontal esteja no primeiro eixo do array fornecido
 	"""
 	return imagem[::-1, ...]
 
 def espelhamento_horizontal(imagem):
 	"""
-	Espelha a imagem na horizontal
+	Espelha a imagem fornecida pelo eixo vertical, invertendo a orientação
+	do eixo horizontal, idependete dos canais presentes na imagem, assume que o
+	eixo vertical esteja no segundo eixo do array fornecido
 	"""
 	return imagem[..., ::-1]
 
 def melhorar_contraste(imagem):
+	"""
+	Melhora o contraste de uma imagem BGR, normalizando a luminosidade dela
+	no espaço de cores YPrPb e usando a diferença de luminosidade resultante
+	para corrigir os valores dos canais B, G e R para a luminosidade normalizada.
+	Isso evita uma conversão direta entre os espaços de cores BGR e YPrPb
+
+	A imagem deve ser do tipo RGB e ter canais na ordem BGR, e deve ser fornecida
+	como um array numpy (numpy.ndarray) de três dimensões, com a terceira dimensão
+	sendo usada para armazenar os canais, ou uma lista ou tupla que seja convertível
+	para um array desse tipo
+	"""
 	kr, kg, kb = (0.299, 0.587, 0.114)
 	"""
 	conversão RGB/BGR -> YPrPb
@@ -69,7 +92,13 @@ def melhorar_contraste(imagem):
 
 def estender_com_zeros(imagem, tamanho=None):
 	"""
-	Estende a imagem com zeros nas bordas
+	Estende a imagem bidimensional fornecida com zeros nas bordas,
+	independente do número de canais.
+
+	Por padrão adiciona uma borda com comprimento de um pixel à imagem,
+	mas pode ser configurado pelo parâmetro 'tamanho' para adicionar
+	outros comprimentos de bordas. Se fornecido, o tamanho deve ser uma
+	lista ou tupla com dois inteiros não negativos.
 	"""
 	# checagem de parâmetros
 	if imagem.ndim < 2:
@@ -105,6 +134,24 @@ def estender_com_zeros(imagem, tamanho=None):
 	return estendida
 
 def convolucao(imagem, kernel, reduzir=False):
+	"""
+	Aplica uma filtragem na imagem fornecida por meio da convolução dela com um kernel,
+	que ocorre isoladamente em cada canal produzindo uma imagem resultante com as mesmas
+	dimensões e número de canais, ou com uma quantidade reduzida de pixels caso um valor
+	verdadeiro for passado ao parâmetro 'reduzir' (o tipo fornecido não importa, desde
+	que o valor possa ser evaluado para True).
+
+	O kernel fornecido deve ter duas dimensões não nulas e ser composto de valores dos
+	tipos float ou int, caso um kernel com números inteiros for fornecido, essa função
+	utilizará números inteiros nas contas a menos que isso cause erros de overflow.
+
+	A convolução é feita primeiro achando o centro do kernel (que é a célula na diagonal
+	superior esquerda mais próxima ao centro), estendendo a imagem com zeros caso necessário
+	através da função estender_com_zeros desse módulo para que a convolução possa ser operada
+	em todos os pixels. Em seguida os NxM vizinhos de cada píxel são multiplicados pelo
+	kernel de dimensões MxN, gerando MxN imagens que são sendo somadas a um acumulador,
+	que é truncado, convertido para armazenar canais de 8 bits e retornado como resultado.
+	"""
 	if imagem.ndim > 3 or imagem.ndim < 2:
 		raise ValueError(f"imagem inválida, número de dimensões não suportado: {imagem.ndim}")
 	if kernel.ndim != 2:
@@ -166,6 +213,14 @@ def convolucao(imagem, kernel, reduzir=False):
 	return np.clip(saida, 0, 255).astype(np.uint8)
 
 def kernel_nitidez(peso=1):
+	"""
+	Gera um kernel 3x3 para realçar a nitidez
+	de imagens pela convolução delas com ele.
+
+	A força do realce de nitidez pode ser configurada
+	pelo parâmetro 'peso', com a única restrição sendo
+	que ele seja valor não negativo.
+	"""
 	if isinstance(peso, int):
 		dtype = int
 	elif isinstance(peso, float):
@@ -184,6 +239,14 @@ def kernel_nitidez(peso=1):
 	], dtype=dtype)
 
 def kernel_deteccao_borda():
+	"""
+	Gera um kernel 3x3 para detecção de bordas
+	em imagens pela convolução delas com ele.
+
+	Esse tipo de kernel pode não funcionar bem
+	com imagens coloridas, sendo melhor utilizado
+	em imagens com tons de cinza.
+	"""
 	return np.array([
 		[-1, -1, -1 ],
 		[-1,  8, -1 ],
@@ -191,6 +254,20 @@ def kernel_deteccao_borda():
 	], dtype=int)
 
 def kernel_gauss(tamanho=None, sigma=1):
+	"""
+	Gera um kernel quadrado com um tamanho especificado contendo uma distribuição normal,
+	que pode ser utilizado para borrar imagens pela convolução delas com o kernel.
+
+	O tamanho do kernel padrão é 3x3, mas pode ser ajustado pelo parâmetro 'tamanho',
+	que se fornecido deve ser um número entre 1 e 32 que será utilizado para a quantidade
+	de linhas e colunas.
+
+	Além disso, o desvio padrão da distribuição pode ser configurado
+	pelo parâmetro 'sigma', que deve ser um número não negativo.
+
+	NOTA: os kernels gerados respeitam a regra da distribuição normal,
+	      onde a soma de todos os pontos deve ser sempre igual a 1
+	"""
 	if tamanho is None:
 		tamanho = 3
 	elif not isinstance(tamanho, int) or isinstance(tamanho, bool):
