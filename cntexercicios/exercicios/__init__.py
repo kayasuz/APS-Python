@@ -1,7 +1,12 @@
 """
-Módulo contendo os contadores de exercícios dentro de seus próprios módulos
-e funções para listagem dos contadores conhecidos, registro de novos contadores
-e execução dos contadores de exercícios pelo nome do exercício
+Módulo contendo os contadores de exercícios dentro de seus próprios módulos,
+funções para listagem, busca e instanciação de contadores de exercícios,
+e classes base para criação de novos contadores.
+
+NOTA: As funções antigas de listagem, registro e execução de contadores
+      de exercícios baseados em funções ainda estão presentes nesse módulo,
+      mas foram depreciadas e serão removidas na próxima versão. Não utilize
+      elas em código novo.
 """
 
 from abc import ABC, abstractmethod
