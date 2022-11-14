@@ -1,7 +1,7 @@
 """
 Módulo para geração de diálogos usando a biblioteca padrão tkinter
 para que o usuário selecione um tipo de exercício, arquivo de vídeo
-ou dispositívos de captura de vídeo
+ou dispositívos de captura de vídeo.
 """
 
 # importação da biblioteca tkinter
@@ -17,10 +17,26 @@ except ImportError:
 
 class DialogoSelecaoExercicio(ttk.Frame):
     """
-    Classe para criação de um diálogo de seleção de exercício
+    Classe da janela de seleção do exercício a ser contado.
+
+    Exibe uma grade com um botão por tipo de exercício fornecido,
+    quando um botão é pressionado o exercício correspondente é
+    armazenado no atributo 'exercicio_selecionado' do objeto
+    e fecha a janela.
     """
 
     def __init__(self, parent, *exercicios, tema=None):
+        """
+        Cria um novo dialogo tkinter para seleção de um tipo de exercício,
+        'parent' deve ser um objeto do tipo Toplevel da biblioteca tkinter,
+        'exercicios' deve ser uma sequência de nomes de exercícios para o
+        usuário selecionar, e 'tema', se fornecido, deve ser um nome de
+        tema do Ttk disponível no sistema.
+
+        Os temas clam, default, classic e alt costuma estar presentes
+        na maiora dos sistemas, enquanto vista, xpnative e winnative
+        estão disponíveis no windows dependendo da versão do sistema.
+        """
         super().__init__(parent, borderwidth=4, relief="groove")
 
         # configuração do tema da janela
@@ -62,7 +78,8 @@ class DialogoSelecaoExercicio(ttk.Frame):
     @staticmethod
     def _estimar_tamanho_grade_botoes(qtd_exercicios):
         """
-        Estima as dimensões da grade de botões dada uma quantidade de botões
+        Estima as dimensões da grade de botões dada uma quantidade de botões,
+        evitando células em branco e preferindo uma grade quadrada quando possível
         """
         # testa de 1 a 8 colunas (ou até a quantidade de exercícios),
         # retornando as dimensões que minimizam espaços em branco
@@ -90,23 +107,40 @@ class DialogoSelecaoExercicio(ttk.Frame):
 
     def selecionar_exercicio(self, exercicio):
         """
-        Seleciona o exercício a ser contado
+        Seleciona o nome de exercício fornecido como o exercício
+        a ser retornado, fechando a janela no processo
         """
         self.exercicio_selecionado = exercicio
         self.fechar()
 
     def fechar(self, evento=None):
         """
-        Fecha a janela principal
+        Fecha a janela do dialogo
         """
         self.parent.destroy()
 
 class DialogoSelecaoVideo(ttk.Frame):
     """
-    Classe para seleção da entrada de vídeo a ser usado para contar os exercícios
+    Classe para seleção da entrada de vídeo a ser usado para contar os exercícios.
+
+    Exibe um dialogo com dois tipos de entradas de vídeo que pode ser alternados,
+    um para selecionar de um arquivo de vídeo, e o outro para especificar um índice
+    de dispositivo de captura do vídeo (exemplo: webcam), e um botão de concluir,
+    que seleciona o vídeo da entrada ativa no momento que o botão é pressionado,
+    armazenando ele no atributo 'video' do objeto e fecha a janela.
     """
 
     def __init__(self, parent, tema=None):
+        """
+        Cria um novo dialogo tkinter para seleção de uma entrada de vídeo,
+        'parent' deve ser um objeto do tipo Toplevel da biblioteca tkinter,
+        e 'tema', se fornecido, deve ser um nome de tema do Ttk disponível
+        no sistema.
+
+        Os temas clam, default, classic e alt costuma estar presentes
+        na maiora dos sistemas, enquanto vista, xpnative e winnative
+        estão disponíveis no windows dependendo da versão do sistema.
+        """
         super().__init__(parent, borderwidth=4, relief="groove")
 
         # configura o tema da janela
@@ -122,11 +156,11 @@ class DialogoSelecaoVideo(ttk.Frame):
             else:
                 self.style.theme_use(tema)
 
-        # atributos da instância visíveis
+        # atributos genéricos
         self.parent = parent
         self.video  = None
 
-        # variaveis usadas nos widgets
+        # variáveis usadas nos widgets
         self._var_arquivo_str     = tkinter.StringVar(parent)
         self._var_dispositivo_str = tkinter.StringVar(parent)
         self._var_tipo_entrada    = tkinter.IntVar(parent, 0)
@@ -211,6 +245,10 @@ class DialogoSelecaoVideo(ttk.Frame):
         self._label_arquivo.configure(text=f"arquivo: {self._var_arquivo_str.get()}")
 
     def _on_mudanca_tipo_entrada(self, *ignorado):
+        """
+        Callback interno, chamado quando o tipo
+        de entrada é alterado pelos radiobuttons
+        """
         if self._var_tipo_entrada.get() == 0:
             # seleção de arquivo de vídeo
             self.focus()
@@ -223,19 +261,30 @@ class DialogoSelecaoVideo(ttk.Frame):
 
     @staticmethod
     def _validar_indice_dispositivo(texto):
-        # valida se o índice de dispositivo fornecido é um número não negativo
+        """
+        Função de validação interna, verifica se o texto
+        fornecido é um índice de dispositivo valido
+        """
         return texto.isdigit() or len(texto) == 0
 
     def _abrir_arquivo(self):
-        # abre um diálogo de seleção de arquivo e
-        # armazena o resultado caso ele seja valido
+        """
+        Função interna para seleção de um arquivo do sistema,
+        armazena o resultado no atributo '_var_arquivo_str' do
+        objeto caso o arquivo seja selecionado com sucesso
+        """
         arquivo = tkinter.filedialog.askopenfilename()
         if isinstance(arquivo, str):
             self._var_arquivo_str.set(arquivo)
             self._label_arquivo.config(text=f"arquivo: {arquivo}")
 
     def _concluir(self):
-        # verifica o vídeo selecionado e gera uma mensagem de erro caso ele seja inválido
+        """
+        Função interna chamada pelo botão de concluir, verifica o tipo
+        de entrada selecionado, gerando erros em caso a entrada esteja
+        em branco, ou em caso da entrada de arquivo, se ele não existir
+        ou não for acessível (sem permissão de leitura).
+        """
         video = None
         if self._var_tipo_entrada.get() == 0:
             # seleção de arquivo de vídeo
