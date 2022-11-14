@@ -33,7 +33,23 @@ class ContadorExercicios(ABC):
     FILTRO_GAUSS_IDX   = 1
     FILTRO_BORDAS_IDX  = 2
 
+    # constantes para especificar o alinhamento de textos na renderização
+    ALINHAR_ESQUERDA = 1
+    ALINHAR_CENTRO   = 2
+    ALINHAR_DIREITA  = 3
+    ALINHAR_INFERIOR = 0
+    ALINHAR_SUPERIOR = 4
+
+    # constantes auxiliares para verificar valores de alinhamentos
+    # ou extrair o alinhamento vertical e horizontal
+    MASCARA_ALINHAMENTO_VERTICAL   = ALINHAR_SUPERIOR
+    MASCARA_ALINHAMENTO_HORIZONTAL = (
+        ALINHAR_ESQUERDA | ALINHAR_CENTRO | ALINHAR_DIREITA
+    )
+    MASCARA_ALINHAMENTO = MASCARA_ALINHAMENTO_HORIZONTAL | MASCARA_ALINHAMENTO_VERTICAL
+
     # constantes que afetam a aparência dos textos
+    ESPACAMENTO_LINHA = 10
     FONTE_PADRAO = cv2.FONT_HERSHEY_SIMPLEX
 
     def __init_subclass__(cls, *args, **kwargs):
@@ -217,6 +233,73 @@ class ContadorExercicios(ABC):
         elif progresso > self.LIMIAR_EXERCICIO_MAX:
             self._estado_exercicio = False
 
+    def _renderizar_texto(self, frame, posicao, texto, alinhamento=None):
+        # checagem dos parâmetros
+        try:
+            x, y = posicao
+            if not isinstance(x, int) or not isinstance(y, int):
+                raise ValueError
+            if x < 0 or y < 0:
+                raise ValueError
+        except ValueError:
+            raise ValueError("'posicao' deve conter dois números inteiros não negativos") from None
+
+        if not isinstance(texto, str):
+            raise TypeError(
+                f"esperado str para o parâmetro 'texto', recebido tipo {type(texto).__qualname__}"
+            )
+
+        if alinhamento is None:
+            alinhamento = self.ALINHAR_DIREITA | self.ALINHAR_INFERIOR
+        elif not isinstance(alinhamento, int):
+            raise TypeError(
+                "esperado int ou None para o parâmetro 'alinhamento', "
+                f"recebido tipo {type(alinhamento).__qualname__}"
+            )
+        elif (alinhamento & self.MASCARA_ALINHAMENTO) != alinhamento:
+            raise ValueError("'alinhamento' deve ter uma constante de alinhamento válida")
+
+        # alinhamento horizontal padrão
+        if (alinhamento & self.MASCARA_ALINHAMENTO_HORIZONTAL) == 0:
+            alinhamento |= self.ALINHAR_DIREITA
+
+        # separação das linhas do texto e substituição de tabulações (tab)
+        linhas = texto.expandtabs(4).split('\n')
+
+        # cálculo do tamanho do texto e correção da posição com o alinhamento
+        comprimento_texto = None
+        alturas = []
+        for linha in linhas:
+            tamanho, _ = cv2.getTextSize(linha, self._fonte, self._tamanho_fonte, self._grossura_fonte)
+            alturas.append(tamanho[1])
+            if comprimento_texto is None or comprimento_texto < tamanho[0]:
+                comprimento_texto = tamanho[0]
+
+        alinhamento_horizontal = alinhamento & self.MASCARA_ALINHAMENTO_HORIZONTAL
+        if alinhamento_horizontal == self.ALINHAR_ESQUERDA:
+            x -= comprimento_texto
+        elif alinhamento_horizontal == self.ALINHAR_CENTRO:
+            x -= comprimento_texto // 2
+
+        if (alinhamento & self.MASCARA_ALINHAMENTO_VERTICAL) == self.ALINHAR_SUPERIOR:
+            # subtrai a altura da caixa de texto da posição y (coordenada de janela)
+            y -= sum(alturas) + self.ESPACAMENTO_LINHA * (len(linhas) - 1)
+
+        # ajuste da cor para o negativo dela quando o filtro de detecção de borda está
+        # ativo (como o vídeo fica escuro com o filtro, uma fonte clara é mais visível)
+        if not self._filtros_ativos[self.FILTRO_BORDAS_IDX]:
+            cor_fonte = self._cor_fonte
+        elif len(self._cor_fonte) == 3:
+            cor_fonte = [255 - x for x in self._cor_fonte]
+        else:
+            cor_fonte = [255 - x for x in self._cor_fonte[:-1]] + [self._cor_fonte[-1]]
+
+        # renderização
+        for altura, linha in zip(alturas, linhas):
+            cv2.putText(frame, linha, (x, y + altura), self._fonte, self._tamanho_fonte, cor_fonte, self._grossura_fonte)
+            # ajuste da posição para a próxima linha
+            y += altura + self.ESPACAMENTO_LINHA
+
     def _renderizar_janela(self, frame):
         """
         Renderiza a janela utilizando o frame fornecido como base,
@@ -226,8 +309,7 @@ class ContadorExercicios(ABC):
         frame = frame.copy()
 
         # renderização de textos
-        cv2.putText(frame, f"Contagem: {self._contagem}", (40, 50),
-            self._fonte, self._tamanho_fonte, self._cor_fonte, self._grossura_fonte)
+        self._renderizar_texto(frame, (20, 20), f"Contagem: {self._contagem}")
 
         # renderização da janela
         cv2.imshow(self._titulo, frame)
