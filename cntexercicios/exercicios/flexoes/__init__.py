@@ -1,7 +1,9 @@
 """
 Módulo contendo um contador de exercícios para a contagem de flexões,
-é recomendado que não se utilize a função diretamente, mas sim a função
-contar_exercicios do módulo cntexercicios.exercicios
+é recomendado que não se utilize a função de contagem ou a classe do
+contador de flexões diretamente, mas sim as funções do módulo
+cntexercicios.exercicios para executar a função indiretamente,
+ou instanciar a classe do contador de flexões
 """
 
 # biblioteca do programa
@@ -76,5 +78,9 @@ class ContadorFlexoes(ContadorExercicios):
 
 @_registrar_exercicio("flexões")
 def contar_flexoes(video):
+    """
+    Instancia a classe ContadorFlexoes para contagem de flexões
+    no vídeo fornecido e inicia a contagem imediatamente
+    """
     contador = ContadorFlexoes(video, titulo="Resultado")
     contador.contar()
