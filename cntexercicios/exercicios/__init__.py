@@ -1,7 +1,12 @@
 """
-Módulo contendo os contadores de exercícios dentro de seus próprios módulos
-e funções para listagem dos contadores conhecidos, registro de novos contadores
-e execução dos contadores de exercícios pelo nome do exercício
+Módulo contendo os contadores de exercícios dentro de seus próprios módulos,
+funções para listagem, busca e instanciação de contadores de exercícios,
+e classes base para criação de novos contadores.
+
+NOTA: As funções antigas de listagem, registro e execução de contadores
+      de exercícios baseados em funções ainda estão presentes nesse módulo,
+      mas foram depreciadas e serão removidas na próxima versão. Não utilize
+      elas em código novo.
 """
 
 from abc import ABC, abstractmethod
@@ -96,7 +101,7 @@ class ContadorExercicios(ABC):
         # processa os frames do vídeo, contando o exercício
         with abrir_video(self._video) as captura:
             for frame in extrair_frames(captura):
-                # faz a deteção do corpo da pessoa presente no vídeo
+                # faz a detecção do corpo da pessoa presente no vídeo
                 self._detectar_corpo(frame)
                 # detecta a transição entre estados do exercício,
                 # aumentando a contagem dele em cada ciclo completo
@@ -134,14 +139,14 @@ class ContadorExercicios(ABC):
         if not self._pontos:
             return
 
-        # cálcula o progresso do exercício
+        # calcula o progresso do exercício
         progresso, valido = self._calc_progresso_exercicio()
 
         # previne a contagem se o exercício não estiver sendo feito corretamente
         if not valido:
             return
 
-        # conta o exercicio com base em seu progresso
+        # conta o exercício com base em seu progresso
         if not self._estado_exercicio:
             if progresso < self.LIMIAR_EXERCICIO_MIN:
                 self._estado_exercicio = True
