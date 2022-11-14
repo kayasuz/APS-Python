@@ -96,6 +96,7 @@ class ContadorExercicios(ABC):
         self._titulo = titulo
         self._video  = video
         self._pausa  = False
+        self._ajuda  = False
         self._frame  = None
 
         # atributos relacionados aos filtros
@@ -309,7 +310,50 @@ class ContadorExercicios(ABC):
         frame = frame.copy()
 
         # renderização de textos
+        h, w, *_ = frame.shape
         self._renderizar_texto(frame, (20, 20), f"Contagem: {self._contagem}")
+        self._renderizar_texto(frame, (w - 20, 20), "h: ajuda", alinhamento=self.ALINHAR_ESQUERDA)
+
+        # mostra cria e renderiza o texto de ajuda caso requisitado
+        if self._ajuda:
+            texto_esq = []
+            texto_dir = [
+                "1: diminuir peso da nitidez  ",
+                "2: aumentar peso da nitidez  ",
+                "3: diminuir reducao de ruido  ",
+                "4: aumentar reducao de ruido  "
+            ]
+
+            # linhas do texto exibido no canto inferior esquerdo
+            if self._mostrar_filtro:
+                texto_esq.append(f"* f: visualizar filtros")
+            else:
+                texto_esq.append(f"  f: visualizar filtros")
+            if self._pausa:
+                texto_esq.append(f"* p: pausar video")
+            else:
+                texto_esq.append(f"  p: pausar video")
+            if self._filtro_contraste:
+                texto_esq.append("* c: melhorar contraste")
+            else:
+                texto_esq.append("  c: melhorar contraste")
+
+            for linha, idx_filtro in (
+                ("n: melhoria de nitidez", self.FILTRO_NITIDEZ_IDX),
+                ("g: reducao de ruido",    self.FILTRO_GAUSS_IDX),
+                ("b: deteccao de bordas",  self.FILTRO_BORDAS_IDX)):
+                if self._filtros_ativos[idx_filtro]:
+                    linha = f"* {linha}"
+                else:
+                    linha = f"  {linha}"
+
+                texto_esq.append(linha)
+
+            # renderização dos textos de ajuda na tela
+            self._renderizar_texto(frame, (20,     h - 20),
+                '\n'.join(texto_esq), alinhamento=self.ALINHAR_SUPERIOR)
+            self._renderizar_texto(frame, (w - 20, h - 20),
+                '\n'.join(texto_dir), alinhamento=self.ALINHAR_SUPERIOR | self.ALINHAR_ESQUERDA)
 
         # renderização da janela
         cv2.imshow(self._titulo, frame)
@@ -323,6 +367,11 @@ class ContadorExercicios(ABC):
         # pausa do vídeo
         if tecla in (ord("p"), ord("P"), ord(" ")):
             self._pausa = not self._pausa
+
+        # mostra/oculta o texto de ajuda
+        elif tecla in (ord("h"), ord("H")):
+            self._ajuda = not self._ajuda
+            print(f"texto de ajuda {'visivel' if self._ajuda else 'oculto'}")
 
         # ativa/desativa a visualização dos filtros
         elif tecla in (ord("f"), ord("F")):
