@@ -222,6 +222,9 @@ class ContadorExercicios(ABC):
         Renderiza a janela utilizando o frame fornecido como base,
         adicionando a contagem de exercícios a ele
         """
+        # cópia para evitar que os filtros sejam aplicados ao texto
+        frame = frame.copy()
+
         # renderização de textos
         cv2.putText(frame, f"Contagem: {self._contagem}", (40, 50),
             self._fonte, self._tamanho_fonte, self._cor_fonte, self._grossura_fonte)
