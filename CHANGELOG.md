@@ -9,6 +9,7 @@
 * Contadores de exercícios
   * Adição de alguns dos filtros do novo módulo `filtros`
   * Ativação/desativação de cada filtro de forma independente
+  * Inversão da cor do texto com o filtro de detecção de borda ativo e o vídeo filtrado sendo exibido
   * Texto de ajuda expansível que explica o que cada tecla faz
   * Possibilidade de exibição do vídeo filtrado ou antes da filtragem
   * Adição de função de renderização de texto com suporte à textos multilinha e alinhamento da caixa de texto,  
