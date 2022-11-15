@@ -93,11 +93,12 @@ class ContadorExercicios(ABC):
         import mediapipe as mp
 
         # atributos genéricos
-        self._titulo = titulo
-        self._video  = video
-        self._pausa  = False
-        self._ajuda  = False
-        self._frame  = None
+        self._titulo         = titulo
+        self._video          = video
+        self._pausa          = False
+        self._ajuda          = False
+        self._mostrar_pontos = False
+        self._frame          = None
 
         # atributos relacionados aos filtros
         from cntexercicios.filtros import kernel_nitidez, kernel_gauss, kernel_deteccao_borda
@@ -318,6 +319,7 @@ class ContadorExercicios(ABC):
         if self._ajuda:
             texto_esq = []
             texto_dir = [
+                "j: mostrar pontos",
                 "1: diminuir peso da nitidez  ",
                 "2: aumentar peso da nitidez  ",
                 "3: diminuir reducao de ruido  ",
@@ -355,6 +357,13 @@ class ContadorExercicios(ABC):
             self._renderizar_texto(frame, (w - 20, h - 20),
                 '\n'.join(texto_dir), alinhamento=self.ALINHAR_SUPERIOR | self.ALINHAR_ESQUERDA)
 
+        # renderiza os pontos do corpo
+        if self._mostrar_pontos and self._pontos is not None:
+            import mediapipe as mp
+            mp.solutions.drawing_utils.draw_landmarks(
+                frame, self._pontos, mp.solutions.pose.POSE_CONNECTIONS
+            )
+
         # renderização da janela
         cv2.imshow(self._titulo, frame)
 
@@ -378,6 +387,12 @@ class ContadorExercicios(ABC):
             novo_estado = not self._mostrar_filtro
             self._mostrar_filtro = novo_estado
             print(f"visualização de filtros {'ativa' if novo_estado else 'inativa'}")
+
+        # ativa/desativa a visualização dos pontos do corpo
+        elif tecla in (ord("j"), ord("J")):
+            novo_estado = not self._mostrar_pontos
+            self._mostrar_pontos = novo_estado
+            print(f"visualizacao de pontos {'ativa' if novo_estado else 'inativa'}")
 
         # ativa/desativa o filtro de melhoria contraste
         elif tecla in (ord("c"), ord("C")):
