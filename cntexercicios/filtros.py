@@ -172,7 +172,7 @@ def convolucao(imagem, kernel, reduzir=False):
 		dims_saida = (f_w - espacamento_x, f_h - espacamento_y, *dim_extras)
 
 	# calcula o tipo apropriado para utilizar no buffer intermediário
-	if np.issubdtype(kernel.dtype, np.floating):
+	if np.issubdtype(kernel.dtype, np.floating) or np.issubdtype(image.dtype, np.floating):
 		dtype = float
 
 	elif np.issubdtype(kernel.dtype, np.integer):
