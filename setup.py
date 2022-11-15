@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="contador-exercicios",
-    version="0.2.0",
+    version="0.3.0",
     python_requires=">=3.6",
     install_requires=[
         "mediapipe",
