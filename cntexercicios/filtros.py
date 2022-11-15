@@ -268,6 +268,8 @@ def kernel_gauss(tamanho=None, sigma=1):
 	NOTA: os kernels gerados respeitam a regra da distribuição normal,
 	      onde a soma de todos os pontos deve ser sempre igual a 1
 	"""
+	import sys
+	import math
 	if tamanho is None:
 		tamanho = 3
 	elif not isinstance(tamanho, int) or isinstance(tamanho, bool):
@@ -281,12 +283,15 @@ def kernel_gauss(tamanho=None, sigma=1):
 		raise TypeError(f"tamanho não suportado")
 	if not isinstance(sigma, (int, float)):
 		raise TypeError(f"esperado int ou float para 'sigma', recebido tipo {type(sigma).__qualname__}")
-	if sigma < 0:
+	if math.copysign(1, sigma) < 0:
 		raise ValueError(f"'sigma' não pode ser um número negativo")
 
 	# distribuição normal em uma dimensão
-	x = np.linspace(-(tamanho // 2), tamanho // 2, tamanho)
-	x = (1 / (np.sqrt(2 * np.pi) * sigma)) * np.e ** (-np.power(x / sigma, 2) / 2)
+	if sigma < sys.float_info.epsilon:
+		x = np.array([0, 1, 0], dtype=np.float)
+	else:
+		x = np.linspace(-(tamanho // 2), tamanho // 2, tamanho)
+		x = (1 / (np.sqrt(2 * np.pi) * sigma)) * np.e ** (-np.power(x / sigma, 2) / 2)
 
 	# extensão da distribuição fazendo o produto externo
 	kernel = np.outer(x.T, x.T)

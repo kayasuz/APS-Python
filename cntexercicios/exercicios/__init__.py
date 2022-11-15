@@ -288,7 +288,7 @@ class ContadorExercicios(ABC):
 
         # ajuste da cor para o negativo dela quando o filtro de detecção de borda está
         # ativo (como o vídeo fica escuro com o filtro, uma fonte clara é mais visível)
-        if not self._filtros_ativos[self.FILTRO_BORDAS_IDX]:
+        if not (self._filtros_ativos[self.FILTRO_BORDAS_IDX] and self._mostrar_filtro):
             cor_fonte = self._cor_fonte
         elif len(self._cor_fonte) == 3:
             cor_fonte = [255 - x for x in self._cor_fonte]
@@ -485,7 +485,7 @@ __all__ = ["ContadorExercicios", *_registro.__all__]
 # NOTE: não mova os imports pra antes dos imports
 #       das funções de registro de exercícios,
 #       isso causará um erro de import circular
-from cntexercicios.exercicios import flexoes
+from cntexercicios.exercicios import flexoes, polichinelos
 
 # módulos dos exercícios acessíveis via "from module import *"
 __all__.extend(["flexoes"])
