@@ -10,7 +10,7 @@ ou instanciar a classe do contador de flexões
 from cntexercicios.exercicios import registrar_exercicio as _registrar_exercicio
 from cntexercicios.exercicios import ContadorExercicios
 
-__all__ = ["contar_flexoes"]
+__all__ = ["contar_flexoes", "ContadorFlexoes"]
 
 class ContadorFlexoes(ContadorExercicios):
     """

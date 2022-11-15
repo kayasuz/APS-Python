@@ -504,7 +504,7 @@ __all__ = ["ContadorExercicios", *_registro.__all__]
 from cntexercicios.exercicios import flexoes, polichinelos
 
 # módulos dos exercícios acessíveis via "from module import *"
-__all__.extend(["flexoes"])
+__all__.extend(["flexoes", "polichinelos"])
 
 # modulo interno com as funções já importadas,
 # seguro de remover a referência
