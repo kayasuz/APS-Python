@@ -202,8 +202,9 @@ class ContadorExercicios(ABC):
         da pessoa presente no frame fornecido, salvando eles no contador
         """
         # processamento dos pontos do corpo humano
-        self._corpo  = self._pose.process(frame)
-        self._pontos = self._corpo.pose_landmarks
+        if not self._pausa or self._corpo is None:
+            self._corpo  = self._pose.process(frame)
+            self._pontos = self._corpo.pose_landmarks
 
     def _posicao_landmark(self, landmark):
         # retorna a posição do ponto como array
