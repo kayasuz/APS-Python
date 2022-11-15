@@ -317,8 +317,8 @@ class DialogoSelecaoVideo(ttk.Frame):
 
 def selecao_exercicio(tema=None):
     # listagem de exercícios e contadores, removendo duplicados com conjuntos
-    from cntexercicios.exercicios import listar_exercicios, listar_contadores
-    exercicios = list({*listar_exercicios(), *listar_contadores()})
+    from cntexercicios.exercicios import listar_contadores
+    exercicios = listar_contadores()
 
     # janela principal
     app = tkinter.Tk()

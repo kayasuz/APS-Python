@@ -7,10 +7,9 @@ ou instanciar a classe do contador de flexões
 """
 
 # biblioteca do programa
-from cntexercicios.exercicios import registrar_exercicio as _registrar_exercicio
 from cntexercicios.exercicios import ContadorExercicios
 
-__all__ = ["contar_flexoes"]
+__all__ = ["ContadorFlexoes"]
 
 class ContadorFlexoes(ContadorExercicios):
     """
@@ -75,12 +74,3 @@ class ContadorFlexoes(ContadorExercicios):
                 return h_flexao, True
 
         return 0, False
-
-@_registrar_exercicio("flexões")
-def contar_flexoes(video):
-    """
-    Instancia a classe ContadorFlexoes para contagem de flexões
-    no vídeo fornecido e inicia a contagem imediatamente
-    """
-    contador = ContadorFlexoes(video, titulo="Resultado")
-    contador.contar()
