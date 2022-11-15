@@ -45,7 +45,7 @@ if video is not None:
 
     # conta o exercício usando uma classe contadora de exercícios se possível,
     # utilizando uma função de contagem registrada caso uma classe não seja encontrada
-    from cntexercicios.exercicios import contar_exercicios, instanciar_contador
+    from cntexercicios.exercicios import instanciar_contador
     try:
         contador = instanciar_contador(exercicio, video)
     except ValueError:

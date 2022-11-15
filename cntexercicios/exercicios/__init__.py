@@ -93,11 +93,12 @@ class ContadorExercicios(ABC):
         import mediapipe as mp
 
         # atributos genéricos
-        self._titulo = titulo
-        self._video  = video
-        self._pausa  = False
-        self._ajuda  = False
-        self._frame  = None
+        self._titulo         = titulo
+        self._video          = video
+        self._pausa          = False
+        self._ajuda          = False
+        self._mostrar_pontos = False
+        self._frame          = None
 
         # atributos relacionados aos filtros
         from cntexercicios.filtros import kernel_nitidez, kernel_gauss, kernel_deteccao_borda
@@ -201,8 +202,9 @@ class ContadorExercicios(ABC):
         da pessoa presente no frame fornecido, salvando eles no contador
         """
         # processamento dos pontos do corpo humano
-        self._corpo  = self._pose.process(frame)
-        self._pontos = self._corpo.pose_landmarks
+        if not self._pausa or self._corpo is None:
+            self._corpo  = self._pose.process(frame)
+            self._pontos = self._corpo.pose_landmarks
 
     def _posicao_landmark(self, landmark):
         # retorna a posição do ponto como array
@@ -318,6 +320,7 @@ class ContadorExercicios(ABC):
         if self._ajuda:
             texto_esq = []
             texto_dir = [
+                "j: mostrar pontos",
                 "1: diminuir peso da nitidez  ",
                 "2: aumentar peso da nitidez  ",
                 "3: diminuir reducao de ruido  ",
@@ -355,6 +358,13 @@ class ContadorExercicios(ABC):
             self._renderizar_texto(frame, (w - 20, h - 20),
                 '\n'.join(texto_dir), alinhamento=self.ALINHAR_SUPERIOR | self.ALINHAR_ESQUERDA)
 
+        # renderiza os pontos do corpo
+        if self._mostrar_pontos and self._pontos is not None:
+            import mediapipe as mp
+            mp.solutions.drawing_utils.draw_landmarks(
+                frame, self._pontos, mp.solutions.pose.POSE_CONNECTIONS
+            )
+
         # renderização da janela
         cv2.imshow(self._titulo, frame)
 
@@ -378,6 +388,12 @@ class ContadorExercicios(ABC):
             novo_estado = not self._mostrar_filtro
             self._mostrar_filtro = novo_estado
             print(f"visualização de filtros {'ativa' if novo_estado else 'inativa'}")
+
+        # ativa/desativa a visualização dos pontos do corpo
+        elif tecla in (ord("j"), ord("J")):
+            novo_estado = not self._mostrar_pontos
+            self._mostrar_pontos = novo_estado
+            print(f"visualizacao de pontos {'ativa' if novo_estado else 'inativa'}")
 
         # ativa/desativa o filtro de melhoria contraste
         elif tecla in (ord("c"), ord("C")):
@@ -474,23 +490,14 @@ def instanciar_contador(exercicio, *args, **kwargs):
 
     return classe(*args, **kwargs)
 
-# importa as funções de registro e listagem de exercícios
-from cntexercicios.exercicios import _registro
-from cntexercicios.exercicios._registro import *
-
 # funções de registro acessíveis via "from module import *"
-__all__ = ["ContadorExercicios", *_registro.__all__]
+__all__ = ["ContadorExercicios"]
 
 # import dos exercícios
-# NOTE: não mova os imports pra antes dos imports
-#       das funções de registro de exercícios,
+# NOTE: não mova os imports pra antes da declaração da classe acima,
 #       isso causará um erro de import circular
-from cntexercicios.exercicios import flexoes
+from cntexercicios.exercicios import flexoes, polichinelos
 
 # módulos dos exercícios acessíveis via "from module import *"
-__all__.extend(["flexoes"])
-
-# modulo interno com as funções já importadas,
-# seguro de remover a referência
-del _registro
+__all__.extend(["flexoes", "polichinelos"])
 
