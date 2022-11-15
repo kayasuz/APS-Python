@@ -12,7 +12,14 @@ class ContextoVideoCapture:
     """
 
     def __init__(self, parametro):
-        # TODO: documentação dos parâmetros dessa função
+        """
+        Cria um gerenciador de contexto que abre e retorna uma captura de vídeo,
+        fechando a captura automaticamente quando o contexto e terminado.
+
+        O parâmetro 'parametro' é utilizado para abrir a captura de vídeo no
+        vídeo especificado, e deve ser um caminho válido para um arquivo de vídeo
+        ou um índice de dispositivo, fornecidos como string e int respectivamente
+        """
         # NOTE: checagem adicional de bool necessária porque o
         #       isinstance(para, (int, str)) retorna True para
         #       valores do tipo bool
@@ -23,6 +30,10 @@ class ContextoVideoCapture:
         self._captura   = cv2.VideoCapture()
 
     def __enter__(self):
+        """
+        Função executada na entrada do gerenciador de contexto, tenta abrir o vídeo
+        fornecido para captura, gerando uma exceção do tipo RuntimeError em caso de falha
+        """
         # tenta abrir a captura de vídeo usando um arquivo
         # ou índice de dispositivo de captura (ex: webcam)
         captura, parametro = self._captura, self._parametro
@@ -38,6 +49,11 @@ class ContextoVideoCapture:
         return captura
 
     def __exit__(self, *ignorado):
+        """
+        Função executada na saída do gerenciador de contexto, fecha a captura de vídeo
+        aberta durante a entrada do contexto e propaga qualquer exceção gerada dentro
+        do contexto.
+        """
         # fecha a captura de vídeo se ela ainda estiver aberta
         captura = self._captura
         if captura.isOpened():

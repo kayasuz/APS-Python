@@ -1,29 +1,37 @@
 
-## Features
+## Adições
 
-* documentação do código
-  * documentação dos módulos do programa
-  * comentários simples mas bem explicativos
+* Novo módulo `cntexercicios.filtros` contendo funções para filtragem de imagens
+  * Filtros de correção de contraste, melhoria de nitidez,
+    borragem gaussiana (Gaussian Blur) e detecção de bordas
+  * Filtragem de imagens pela convolução de kernels
 
-* contagem de exercícios
-  * registro e listagem de contadores de exercícios no código
-  * execução dos contadores pelo nome do exercício
+* Contadores de exercícios
+  * Adição de alguns dos filtros do novo módulo `filtros`
+  * Ativação/desativação de cada filtro de forma independente
+  * Inversão da cor do texto com o filtro de detecção de borda ativo e o vídeo filtrado sendo exibido
+  * Texto de ajuda expansível que explica o que cada tecla faz
+  * Possibilidade de exibição do vídeo filtrado ou antes da filtragem
+  * Adição de função de renderização de texto com suporte à textos multilinha e alinhamento da caixa de texto,  
+    que pode ser utilizada por subclasses para abstrair a renderização de textos do OpenCV
 
-  * contador de flexões
-    * contagem de flexões em vídeos usando as bibliotecas opencv-python e mediapipe
-    * execução direta pela linha de comando para contagem no vídeo fornecido
-    * importação de módulos dentro do contador, minimizando o tempo de carregamento do módulo
-    * prevenção da contagem quando as pernas não estão retas ou o corpo não está na horizontal
-    * contagem levando em conta a perspectiva, profundidade, tamanho da pessoa e resolução do vídeo
+## Melhorias
 
-* interface do usuário
-  * execução do programa pela linha de comando
-  * diálogos para seleção de exercício ou vídeo, com suporte a temas Ttk
-  * seleção do tema dos diálogos na execução do programa pela linha de comando
+* Função de pausar o vídeo durante a contagem de exercícios através da tecla P ou da barra de espaço
+* Melhoria da aparência dos textos nos contadores de exercícios
+* Adição de documentação em alguns métodos sem documentação
+* Melhoria na documentação dos módulos `cntexercicios.video`, `cntexercicios.dialogo` e `cntexercicios.exercícios.flexoes`
 
-* features extras
-  * módulo auxiliar para facílitar a entrada e preprocessamento de vídeo
-  * ambiente minimo para desenvolvimento e empacotamento do programa
-  * adição de arquivo README.md descrevendo brevemente o projeto
-  * adição da licença no arquivo LICENSE
+## Mudanças
 
+* Reformulação dos contadores de exercícios
+  * Adição de nova classe base `ContadorExercicios` para criação de contadores de exercícios com registro automático
+  * Funções para listagem de nomes exercícios implementados, busca, instanciação e execução de contadores baseados na nova classe
+
+* Depreciação de código
+  * Depreciação de contadores de exercícios baseados em funções em favor da implementação de contadores usando a nova classe base abstrata
+  * Depreciação das funções de registro, listagem e execução associadas a contadores de exercícios implementados por funções
+
+## Correções
+
+* Algumas correções em comentários em partes variadas do código
