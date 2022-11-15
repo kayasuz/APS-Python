@@ -485,7 +485,7 @@ __all__ = ["ContadorExercicios", *_registro.__all__]
 # NOTE: não mova os imports pra antes dos imports
 #       das funções de registro de exercícios,
 #       isso causará um erro de import circular
-from cntexercicios.exercicios import flexoes
+from cntexercicios.exercicios import flexoes, polichinelos
 
 # módulos dos exercícios acessíveis via "from module import *"
 __all__.extend(["flexoes"])
