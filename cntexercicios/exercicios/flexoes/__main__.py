@@ -15,7 +15,7 @@ if __name__ != "__main__":
 import sys, os
 
 # contador a ser executado
-from cntexercicios.exercicios.flexoes import contar_flexoes
+from cntexercicios.exercicios.flexoes import ContadorFlexoes
 
 # mostra a ajuda caso necessário
 if len(sys.argv) != 2:
@@ -40,5 +40,5 @@ if isinstance(arquivo, str):
         print(f"erro: '{arquivo}' não é um arquivo", file=sys.stderr)
 
 # contagem das flexões
-contar_flexoes(arquivo)
-
+contador = ContadorFlexoes(arquivo)
+contador.contar()
